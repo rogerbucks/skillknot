@@ -202,6 +202,7 @@ class RepoTests(unittest.TestCase):
         self.assertEqual(run.call_args.args[0], ["gh", "secret", "set", "LEAK_TERMS"])
         self.assertEqual(run.call_args.kwargs["input"], "acme\n")
         self.assertNotIn("acme", text)
+        self.assertNotIn("LEAK_TERMS", text)
 
 
 if __name__ == "__main__":

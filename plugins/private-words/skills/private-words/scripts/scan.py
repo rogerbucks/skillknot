@@ -163,7 +163,7 @@ def run(args):
             cwd=repo,
             check=True,
         )
-        print(f"Stored {len(words)} word(s) as {args.set_secret}.")
+        print(f"Stored {len(words)} word(s) in the named secret.")
         return 0
 
     found = scan_files(repo, words, args.allow)
