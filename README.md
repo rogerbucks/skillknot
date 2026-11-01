@@ -105,7 +105,8 @@ claude plugin install <skill>@skillknot
 ```
 
 Then run it as `/<skill>:<skill>`, for example `/gauntlet:gauntlet <item>`. Step-by-step notes,
-including the guards and the hardened settings, are in [docs/INSTALL.md](docs/INSTALL.md).
+including the guards, the hardened settings and a macOS job that keeps every plugin current on
+each push, are in [docs/INSTALL.md](docs/INSTALL.md).
 
 For another agent, or to read before you trust it, copy the skill's folder from
 `plugins/<name>/skills/<name>` into that agent's skills folder.
