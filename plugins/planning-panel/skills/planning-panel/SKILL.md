@@ -29,12 +29,17 @@ Rules:
 - **A question leaves the list once answered,** and its answer moves into goal, audience or limits
 - **Mark guesses as guesses** until the user confirms them
 - **Next steps start with a verb** and are things someone can do this week
+- **Tie a question to the step it holds up** where there is one, and name that step in the plan
+- **Keep a finished step and mark it done,** so progress stays visible
 
 ## Where the plan lives
 
 - **A live pane (Claude Code with mods).** If the `update_plan` tool from this plugin is
   available, call it each time a field changes. Send only the fields that changed: a list you send
-  replaces that list whole. Do not repeat the plan in the chat as well, because the pane shows it
+  replaces that list whole. Send a step as `{ text, done: true }` once it is finished, and a
+  question as `{ text, step }` to tie it to the step it holds up, counted from 1. Send the
+  questions again if the steps are renumbered. Do not repeat the plan in the chat as well, because
+  the pane shows it
 - **No pane.** If the tool answers that no pane can show (some app views draw none), or there is
   no tool, show the plan as a short block when it changes in a way that matters: a new goal,
   a new limit, or a question answered. Not after every message

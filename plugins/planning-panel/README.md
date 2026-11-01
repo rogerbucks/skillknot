@@ -11,6 +11,21 @@ kept current as the conversation moves:
 | **Open questions** | What is still undecided |
 | **Next steps** | The next actions, in order |
 
+The plan is drawn as a route. The goal sits at the top, each step is a station, and an open
+question hangs off the step it holds up. A progress bar and a fence of limits frame it.
+
+| Colour | Means |
+| --- | --- |
+| **Green** | Done |
+| **Blue** | Now: the first step free to start |
+| **Amber** | Held by an open question, or a question no step owns yet |
+| **Grey** | Later |
+| **Red** | A limit |
+
+Desktop, editor and mobile panes draw this as a picture. A drawing cannot read the app's theme,
+so it carries its own dark board. The terminal has no vector drawing, so it shows the same route
+in coloured text.
+
 > **Early access.** The pane is a Claude Code mod, and mods need Claude Code's early-access
 > switch today. Install this plugin only if your Claude Code has that switch on. Without it, use
 > the `planning-panel` skill on its own: it keeps the same five fields in the chat instead.
@@ -27,6 +42,8 @@ At the prompt of a terminal session:
 
 - **Start planning.** Claude calls the panel's `update_plan` tool as the goal, audience, limits,
   questions and steps change, and the pane opens the first time it does
+- **Tie a question to a step.** A question sent as `{ text, step }` holds that step, counted from
+  1, until the question goes. A step sent as `{ text, done: true }` shows as finished
 - **`/plan-panel`** opens the pane. **`/plan-panel clear`** empties it. **`/plan-panel copy`**
   prints the plan as Markdown, ready to paste
 - **With other skills.** While `design-brief` or `slide-storyline` runs, their answers fill the
