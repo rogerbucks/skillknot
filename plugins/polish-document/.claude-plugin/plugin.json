@@ -1,0 +1,8 @@
+{
+  "name": "polish-document",
+  "description": "Turn a rough capture into a professional document: gaps first, then review, format and diagrams",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "obsidian-canvas",
+  "description": "Build, lay out and verify Obsidian canvas files that read as an argument, not a picture",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

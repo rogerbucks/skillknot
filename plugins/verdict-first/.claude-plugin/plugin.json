@@ -1,0 +1,8 @@
+{
+  "name": "verdict-first",
+  "description": "A verdict-first, low-filler reply style for readers who skim, with a Claude Code output style",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}
