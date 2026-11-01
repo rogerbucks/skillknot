@@ -44,5 +44,7 @@ put that at the top of the report.
 
 The repository runs a weekly link check over every standards file. A dead link opens nothing by
 itself: the maintainer reads the result, confirms the new location, and updates the row and its
-Checked date in a pull request. A review that finds a registry update says so in its report, so
+Checked date in a pull request. Many government sites refuse automated checkers (bot challenges,
+HTTP/2 resets, 503s, or a 404 for a page that opens in a browser), so a failure there means
+*open it by hand*, not *dead*. A review that finds a registry update says so in its report, so
 the user can send it upstream.
