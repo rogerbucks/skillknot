@@ -7,7 +7,8 @@ Written fresh for this repo. No code was copied. The links were read on 1 Nov 20
   `cost.total_duration_ms`, `context_window.used_percentage` and `workspace.current_dir`
 - **[Claude Code hooks](https://code.claude.com/docs/en/hooks).** The `UserPromptSubmit` event,
   `systemMessage` to warn the person, `additionalContext` to tell the agent, and
-  `decision: "block"` to hold a prompt
+  `decision: "block"` to hold a prompt, and the `Stop` event with its `transcript_path` and
+  `stop_hook_active` fields
 
 ## Design choices
 
@@ -18,4 +19,6 @@ Written fresh for this repo. No code was copied. The links were read on 1 Nov 20
   only the person can set it
 - **Unknown is shown as nothing, never as safe.** The guards part appears only when the meter can
   read the plugin list
+- **The reminder never stops the agent.** A Stop hook can force more work, but a reminder that
+  forces work is a nag. It shows one line and counts edits, so a session spent reading stays quiet
 - **A broken meter stays silent.** It must never block a prompt by failing

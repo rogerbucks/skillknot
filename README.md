@@ -52,7 +52,8 @@ so you can install only the ones you want.
 - **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and connector sends, and keep
   secrets out of reach, plus a hardened `settings.json` template. **Claude Code only**
 - **`claude-code-session-meter`:** a status line showing branch, unpushed work, context, cost and
-  time, plus a cap that warns when a session runs long or costly. **Claude Code only**
+  time, a cap that warns when a session runs long or costly, and a reminder to hand off before
+  stopping. **Claude Code only**
 
 ### Tools for one app
 

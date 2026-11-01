@@ -1,18 +1,19 @@
 ---
 name: claude-code-session-meter
-description: Use when setting up or tuning a Claude Code status line that shows branch, unpushed work, context used, cost and time, or a cap that warns when a session runs too long or costs too much, or when the session cap has warned or held a prompt.
+description: Use when setting up or tuning a Claude Code status line that shows branch, unpushed work, context used, cost and time, a cap that warns when a session runs too long or costs too much, or a reminder to hand off before stopping, or when the cap or reminder has spoken.
 license: MIT
 compatibility: Claude Code only. Needs python3 (standard library only), and git on the PATH for the branch part. Cost and context come from Claude Code's status line data, which is an estimate, not a bill.
 ---
 
 # claude-code-session-meter: see the session, cap the session
 
-Two parts, which work alone or together:
+Three parts, which work alone or together:
 
 | Part | Shows or does | Why it earns its place |
 | --- | --- | --- |
 | **Status line** | `⎇ main ↑2 ●3 │ ctx 42% │ $1.23 of $5.00 │ 37m │ guards on` | Unpushed commits, a filling context and a growing bill are invisible until they hurt. One glance shows all of them |
 | **Session cap** | Warns at 80% and at 100% of a limit on cost, minutes or prompts. Can hold one prompt at the limit | A long session gets slower, costlier and less accurate. A nudge at the right moment saves more than any setting |
+| **Handoff reminder** | At the end of a turn, after 10 file edits and 20 minutes with no handoff, shows one line suggesting the `handoff` skill | Decisions and next steps live in the chat and die with it. The moment to save them is before you walk away, which is exactly when nobody remembers |
 
 Reading the status line, left to right:
 
@@ -31,7 +32,7 @@ claude plugin marketplace add rogerbucks/skillknot
 claude plugin install claude-code-session-meter@skillknot
 ```
 
-**The cap is a hook, so it starts in the next session.** The status line is a setting, which a
+**The cap and the reminder are hooks, so they start in the next session.** The status line is a setting, which a
 plugin cannot set, so it takes one more step:
 
 1. **Copy the two scripts** somewhere stable. They are in the installed plugin's `scripts`
@@ -61,7 +62,9 @@ Optional JSON at `~/.config/skillknot/claude-code-session-meter.json`. It stays 
   "max_minutes": 120,
   "max_turns": 100,
   "warn_at": 0.8,
-  "hard_stop": false
+  "hard_stop": false,
+  "handoff_after_edits": 10,
+  "handoff_after_minutes": 20
 }
 ```
 
@@ -71,11 +74,16 @@ Optional JSON at `~/.config/skillknot/claude-code-session-meter.json`. It stays 
   it, the cap counts prompts and minutes only
 - **`hard_stop`:** the first prompt past a limit is held, with the reason. Send it again to go on.
   It is held once per limit, so it can never trap you
+- **`handoff_after_edits` and `handoff_after_minutes`:** when the reminder speaks. It speaks
+  again only after as many edits again. Set `handoff_after_edits` to `0` to turn it off. Install
+  the `handoff` skill for the reminder to point at
 
-## When the cap warns you, as the agent
+## When the cap or the reminder speaks, as the agent
 
 - **Finish the step in hand,** then tell the person in one line which limit passed
 - **Offer a way out:** wrap up, run a handoff, or start a fresh session with a short brief
+- **After a handoff reminder,** offer to run the handoff before the person leaves. Do not run it
+  unasked
 - **Never work faster or cut checks to beat the cap.** The cap is about the person's budget, not
   a race
 

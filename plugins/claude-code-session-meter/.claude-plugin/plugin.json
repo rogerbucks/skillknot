@@ -1,6 +1,6 @@
 {
   "name": "claude-code-session-meter",
-  "description": "A Claude Code status line for branch, unpushed work, context, cost and time, plus a cap that warns when a session runs long or costly",
+  "description": "A Claude Code status line for branch, unpushed work, context, cost and time, plus a cap that warns when a session runs long or costly, and a handoff reminder",
   "author": {
     "name": "rogerbucks"
   },

@@ -103,6 +103,54 @@ class Meter(unittest.TestCase):
         self.assertIn("$2.50", held["reason"])
         self.assertIsNone(self.cap("c"))
 
+    def nudge(self, transcript, stop_active=False):
+        out = self.run_script(
+            "handoff_nudge.py",
+            {
+                "session_id": "h",
+                "transcript_path": str(transcript),
+                "stop_hook_active": stop_active,
+            },
+        )
+        return json.loads(out)["systemMessage"] if out else None
+
+    def test_handoff_reminder(self):
+        self.config.write_text(
+            json.dumps({"handoff_after_edits": 3, "handoff_after_minutes": 0})
+        )
+        transcript = Path(self.tmp.name, "t.jsonl")
+
+        def add(*names):
+            with transcript.open("a") as handle:
+                for name in names:
+                    tool = {"type": "tool_use", "name": name, "input": {}}
+                    if name == "handoff":
+                        tool = {
+                            "type": "tool_use",
+                            "name": "Skill",
+                            "input": {"skill": "handoff:handoff"},
+                        }
+                    handle.write(
+                        json.dumps(
+                            {"type": "assistant", "message": {"content": [tool]}}
+                        )
+                        + "\n"
+                    )
+
+        add("Read", "Edit", "Write")
+        self.assertIsNone(self.nudge(transcript))
+        add("Edit")
+        self.assertIsNone(self.nudge(transcript, stop_active=True))
+        self.assertIn("3 file edits", self.nudge(transcript))
+        self.assertIsNone(self.nudge(transcript))
+        add("handoff", "Edit", "Edit")
+        self.assertIsNone(self.nudge(transcript))
+        add("Edit")
+        self.assertIn("3 file edits", self.nudge(transcript))
+        self.config.write_text(json.dumps({"handoff_after_edits": 0}))
+        add("Edit", "Edit", "Edit")
+        self.assertIsNone(self.nudge(transcript))
+
     def test_broken_input_is_silent(self):
         done = subprocess.run(
             [sys.executable, str(METER / "session_cap.py")],
