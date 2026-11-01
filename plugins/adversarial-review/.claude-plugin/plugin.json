@@ -1,0 +1,8 @@
+{
+  "name": "adversarial-review",
+  "description": "Hostile expert-panel review of one or more items against audiences, styles, standards and obligations, by region",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

@@ -7,6 +7,9 @@ throughout. This file holds the reasoning that the code cannot.
 
 - **`gauntlet`:** repeated builder and critic rounds against a bar, with blind comparison
 - **`private-words`:** keeps private words out of a repo, with a list held outside every repo
+- **`adversarial-review` (in review, not yet on `main`):** a hostile expert panel attacks one or
+  more items against audiences, styles, standards and obligations by region, phase and industry.
+  The user confirms the panel first, and any lens they ask for always runs
 - **The gate:** pull requests only, rebase merges only, and `checks` and `lint` must pass. The
   `links` job reports but does not block
 - **Clean installs work:** both skills were installed from GitHub into an empty configuration
@@ -30,6 +33,25 @@ eleven plugins, and it is a draft that cannot merge yet.
 
 Pull request 8 was not reviewed for this handover. Everything above comes from its description and
 its file list.
+
+## `adversarial-review`: what to know
+
+- **Sources are links, not copies.** Each standard has an ID, its official link, a short cached
+  note and the date the link was last confirmed. About 95 rows across global, US, EU, UK,
+  Australia and New Zealand, Asia Pacific and Canada were opened on 1 Nov 2026
+- **Rows marked *never*** could not be confirmed that day: the page refused automated reads or
+  rendered empty. The skill refreshes them on first use. Check them by hand when convenient:
+  `GL-ISO42001`, `GL-UNGP`, `US-COAI`, `EU-NIS2`, `EU-GREEN`, `EU-CSRD`, `AU-E8`, `IN-DPDP`,
+  `HK-PDPO`, `CA-QC25`
+- **Weekly freshness, two layers.** At run time, any standard in use that was checked more than 7
+  days ago is reopened and written to a local cache outside the repo. In the repo, the
+  `Standards links` workflow checks every link each Monday and only warns
+- **Lifecycle and industry sweep.** `references/lifecycle.md` maps ten company phases (formation
+  to exit) and ten industries to the extra audiences, lenses, standards and experts each brings.
+  Its last section lists registry gaps it found: employment, insolvency, competition and takeover,
+  sanctions and export, safety and environment, child safety and charity codes, professional
+  conduct. Fill those one region at a time
+- **Not proven:** no live run yet, and no stranger dry-run beyond the author's paper run
 
 ## Why it is built this way
 
