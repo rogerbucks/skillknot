@@ -50,7 +50,7 @@ test('the tool fills the panel, and a later call replaces only what it sends', a
   })
   const ran = await $.tool.call({ tool: TOOL, open_questions: [] })
   // A tool's result reaches the model as text: an object is refused in a session.
-  expect(typeof ran.result).toBe('string')
+  expect(String(ran.result)).toMatch(/^Panel updated\./)
 
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
@@ -85,4 +85,16 @@ test('a value an earlier version stored is declined', async ($, on) => {
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   expect(await ui.find({ type: 'Text', text: /Start planning/ })).toBeDefined()
   await ui.unmount()
+})
+
+test('where no pane can show, the result says to keep the plan in the chat', async ($, on) => {
+  on('command.register', () => ({ value: { command: 'plan-panel' } }))
+  on('tool.register', () => ({ value: { tool: TOOL } }))
+  on('ui.open', () => ({ value: { isPlaced: false, reason: 'no-surface' } }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+
+  const ran = await $.tool.call({ tool: TOOL, goal: 'Pick a venue' })
+  expect(String(ran.result)).toMatch(/^No pane can show here/)
+  expect(String(ran.result)).toMatch(/Pick a venue/)
 })

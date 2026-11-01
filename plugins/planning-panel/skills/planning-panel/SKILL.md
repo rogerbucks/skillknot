@@ -35,7 +35,8 @@ Rules:
 - **A live pane (Claude Code with mods).** If the `update_plan` tool from this plugin is
   available, call it each time a field changes. Send only the fields that changed: a list you send
   replaces that list whole. Do not repeat the plan in the chat as well, because the pane shows it
-- **No pane.** Show the plan as a short block when it changes in a way that matters: a new goal,
+- **No pane.** If the tool answers that no pane can show (some app views draw none), or there is
+  no tool, show the plan as a short block when it changes in a way that matters: a new goal,
   a new limit, or a question answered. Not after every message
 
 ```markdown
