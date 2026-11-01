@@ -49,11 +49,13 @@ project, and keep `.gauntlet/` out of version control. The plan goes in this ord
 3. **The bar:** a machine bar (a script that exits 0) and a judged bar (a named reference, with
    what the judge looks for). With no reference, write an answer key: the correct outcomes,
    agreed with the user at the gate. Critics may not change the bar
-4. **Pieces:** the smallest separately judged parts. Mark each *fixed* (fully specified, so no
+4. **Deterministic first:** go through every stage and every judged line. If a script can do it
+   or measure it, make it a script step or a machine-bar line, so no model is paid for it
+5. **Pieces:** the smallest separately judged parts. Mark each *fixed* (fully specified, so no
    judgement is needed), *coupled* (a change affects another piece) or *independent*
-5. **Where things live** (below), checked against the project's guards before the first agent
-6. **Cap and stop rules**, and an estimate per stage, including the lead session
-7. **The capture or test tool**, and how it will be proved
+6. **Where things live** (below), checked against the project's guards before the first agent
+7. **Cap and stop rules**, and an estimate per stage, including the lead session
+8. **The capture or test tool**, and how it will be proved
 
 Ask the user only what the bar cannot be written without. If told not to ask, make the choice,
 mark it in the plan, and show it at the gate.
@@ -104,7 +106,7 @@ strongest on judging.
 
 ## Stages 2 to 4: Fixed items, first version, scripts
 
-- **2 Fixed items:** one fast-tier pass
+- **2 Fixed items:** a script or codemod where one can do it, otherwise one fast-tier pass
 - **3 First version:** one mid-tier pass per piece, no critic, in dependency order
 - **4 Scripts:** run the machine bar after each piece. Failures go back to the same builder, at
   most twice. Read the checker's result yourself. A checker can be wrong, so count a sample by
@@ -136,6 +138,8 @@ blockers, rerun the machine bar, and say which fixes had no blind judgement. If 
 - **Tally** model, tokens and cost per piece and round, including the lead session, from the
   token counts your tools report. Label it an estimate
 - **Write** the result into the plan
+- **Name each fault a model found that a script could have caught,** as a machine-bar line for next
+  time
 - **Show the user** before and after, what passed, what did not, and what was never verified
 - **Stop.** Replacing the live item is the user's call
 
