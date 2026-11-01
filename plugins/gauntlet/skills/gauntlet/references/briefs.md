@@ -5,7 +5,7 @@ Fill the braces. Every brief is complete in itself, because the agent has no oth
 
 **Guard line:** `If a guard blocks an action, stop and report it. Never reword, re-encode or use another tool to get around it. Change nothing outside {paths}.`
 
-## Builder (Sonnet, or Haiku for a fixed item)
+## Builder (mid tier, or fast tier for a fixed item)
 
 ```text
 Piece: {what to change, in one or two sentences}.
@@ -17,7 +17,7 @@ Report what changed and anything you could not do. {guard line}
 
 Later rounds go to the same builder: `The judge named these faults: {faults}. Fix them on the kept version, which is {path}.`
 
-## Round critic (Sonnet, a new agent every round)
+## Round critic (mid tier, a new agent every round)
 
 ```text
 Goal: {goal}. Bar: {the bar, verbatim}.
@@ -28,7 +28,7 @@ where it is and why it fails. Say if any capture looks faulty. {guard line}
 
 The critic gets no builder summary, no earlier verdicts and no reasoning.
 
-## Blind pair and judge (Opus, a new agent every round)
+## Blind pair and judge (strongest tier, a new agent every round)
 
 Making the pair is the lead's job:
 
@@ -47,7 +47,7 @@ Name the three faults that most hold the winner back. {guard line}
 
 Unblind only after the verdict arrives. The verdict and its faults stand as written.
 
-## Final critic (Opus, a new agent)
+## Final critic (strongest tier, a new agent)
 
 ```text
 Goal: {goal}. Bar: {the bar, verbatim}.

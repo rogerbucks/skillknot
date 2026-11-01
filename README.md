@@ -41,12 +41,21 @@ A skill belongs here if it would work, unchanged and useful, for someone else on
 
 1. Add `plugins/<name>/skills/<name>/SKILL.md` and `plugins/<name>/.claude-plugin/plugin.json`
 2. List the plugin in `.claude-plugin/marketplace.json` and the skill above
-3. Credit your sources in the skill's `references/sources.md`
-4. Run `python3 scripts/check.py`, and open a pull request
+3. Say what the skill needs in its `compatibility` field
+4. Credit your sources in the skill's `references/sources.md`
+5. Dry-run it as a stranger would, because no check can tell if its advice is good
+6. Run `python3 scripts/check.py`, and open a pull request
 
 `main` takes only changes that pass CI. The check looks for home folder paths, personal email
-addresses, secrets and a list of private words kept outside the repo, and it tests each skill's
-format. Turn on the same check for your own pushes with `git config core.hooksPath .githooks`.
+addresses, secrets, hidden text and a list of private words kept outside the repo, and it tests
+each skill's format. Anything that lets a plugin act, such as a hook, a script or a tool permission,
+needs a reviewed line in `reviewed-powers.json`. Turn on the same check for your own pushes with `git config core.hooksPath .githooks`.
+
+## Vendors
+
+Skills here stay vendor neutral, with one folder per skill. Each skill declares what it needs in
+`compatibility`, and any model names go in its `references/models.md`. A skill that truly works
+with one vendor says so in its name.
 
 ## Licence
 
