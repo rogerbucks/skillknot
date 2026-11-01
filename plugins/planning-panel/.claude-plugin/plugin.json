@@ -1,6 +1,6 @@
 {
   "name": "planning-panel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Claude Code pane beside the chat that keeps the plan current as you talk: goal, audience, limits, open questions and next steps. Needs Claude Code early access (mods)",
   "author": {
     "name": "rogerbucks"
