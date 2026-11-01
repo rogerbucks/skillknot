@@ -34,7 +34,19 @@ so you can install only the ones you want.
 - **`verdict-first`:** a reply style for readers who skim: verdict first, one recommendation,
   honest confidence. Ships a Claude Code output style too
 
+### Presentation and design
+
+- **`slide-storyline`:** turn a topic, notes or data into a deck storyline. One headline claim
+  per slide, proof beneath it, so a reader who skims only the headlines still gets the argument
+- **`chart-picker`:** pick the chart from the reader's question, keep axes honest, and make it
+  readable by colour-blind readers and in black and white
+- **`design-brief`:** turn a vague "make me a..." into a one-page brief (audience, job, limits,
+  what is out, a test of done) and get one yes before building
+
 ### Research and analysis
+
+- **`threat-model`:** a plain-English threat model for a feature, process, vendor or plan. What
+  could go wrong, how likely and how bad, and the cheapest big fixes first. Reports only
 
 - **`ownership-map`:** trace who ultimately controls a company, what else they hold, and where
   interests align, without asserting collusion
@@ -47,6 +59,8 @@ so you can install only the ones you want.
 
 - **`capability-ladder`:** when a capability is missing, check what exists, pick the cheapest
   fix, and propose before installing anything
+- **`model-picker`:** match each step of a job to the cheapest AI model tier and effort that does
+  it well, test that on a sample, and report the saving. Vendor neutral
 - **`context-budget`:** measure always-loaded context and hook latency against budgets, and fix a
   breach by moving material, not deleting it
 - **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and connector sends, and keep
@@ -59,8 +73,10 @@ so you can install only the ones you want.
 - **`obsidian-canvas`:** build and verify Obsidian canvas files that read as an argument, and work
   on desktop and mobile
 
-**Status of the skills added on 1 Nov 2026:** each was rewritten from a method in private use and
-dry-run on paper, but none has yet had a full run as a stranger. Treat them as early.
+**Status of the skills added on 1 Nov 2026:** the presentation, design, threat model and model
+picker skills were written fresh from published methods and have had no live run yet. The rest
+were each rewritten from a method in private use and dry-run on paper, but none has yet had a
+full run as a stranger. Treat them as early.
 
 ## Install
 

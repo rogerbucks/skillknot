@@ -1,0 +1,8 @@
+{
+  "name": "chart-picker",
+  "description": "Pick the chart that answers the reader's question, keep it honest, and make it readable by everyone, including colour-blind readers",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

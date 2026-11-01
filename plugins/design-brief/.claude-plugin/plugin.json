@@ -1,0 +1,8 @@
+{
+  "name": "design-brief",
+  "description": "Turn a vague request into a one-page design brief: audience, job, limits and a test of done, agreed before anything is built",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

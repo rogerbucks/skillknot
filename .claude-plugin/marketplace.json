@@ -17,6 +17,11 @@
       "description": "When a task exposes a missing capability: check what exists, pick the cheapest fix, propose before installing"
     },
     {
+      "name": "chart-picker",
+      "source": "./plugins/chart-picker",
+      "description": "Pick the chart that answers the reader's question, keep it honest, and make it readable by everyone, including colour-blind readers"
+    },
+    {
       "name": "claude-code-guards",
       "source": "./plugins/claude-code-guards",
       "description": "Claude Code hooks that ask before pushes, destructive commands and connector sends, keep secrets out of reach, plus a hardened settings template"
@@ -32,6 +37,11 @@
       "description": "Measure an agent setup's always-loaded context and hook latency against budgets, and fix by relocating"
     },
     {
+      "name": "design-brief",
+      "source": "./plugins/design-brief",
+      "description": "Turn a vague request into a one-page design brief: audience, job, limits and a test of done, agreed before anything is built"
+    },
+    {
       "name": "document-bundle",
       "source": "./plugins/document-bundle",
       "description": "Keep one source document and derive every audience version from it, so copies never drift"
@@ -45,6 +55,11 @@
       "name": "handoff",
       "source": "./plugins/handoff",
       "description": "End a working session with nothing left only in the chat: sweep, persist, release, verify, report"
+    },
+    {
+      "name": "model-picker",
+      "source": "./plugins/model-picker",
+      "description": "Match each task to the cheapest AI model and effort level that can do it well, and say what that saves"
     },
     {
       "name": "obsidian-canvas",
@@ -72,9 +87,19 @@
       "description": "Research web questions and report sourced findings, without acting or sending anything"
     },
     {
+      "name": "slide-storyline",
+      "source": "./plugins/slide-storyline",
+      "description": "Turn a topic, notes or data into a deck storyline: one headline claim per slide, evidence under it, built to survive a skim"
+    },
+    {
       "name": "taxonomy-review",
       "source": "./plugins/taxonomy-review",
       "description": "Review a folder or category structure and recommend merges and splits, without moving anything"
+    },
+    {
+      "name": "threat-model",
+      "source": "./plugins/threat-model",
+      "description": "A plain-English threat model for a feature, process, vendor or plan: what could go wrong, how likely, how bad, and the cheapest fixes first"
     },
     {
       "name": "verdict-first",
