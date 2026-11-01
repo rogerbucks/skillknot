@@ -1,5 +1,5 @@
 {
-  "description": "Outward, secret and connector guards. Each asks or refuses; none edits anything.",
+  "description": "Outward, destructive, secret and connector guards. Each asks or refuses; none edits anything.",
   "hooks": {
     "PreToolUse": [
       {
@@ -9,6 +9,11 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/outward_confirm.py\"",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/destructive_guard.py\"",
+            "timeout": 10
           }
         ]
       },

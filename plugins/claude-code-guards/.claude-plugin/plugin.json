@@ -1,6 +1,6 @@
 {
   "name": "claude-code-guards",
-  "description": "Claude Code hooks that ask before pushes and connector sends, keep secrets out of reach, plus a hardened settings template",
+  "description": "Claude Code hooks that ask before pushes, destructive commands and connector sends, keep secrets out of reach, plus a hardened settings template",
   "author": {
     "name": "rogerbucks"
   },

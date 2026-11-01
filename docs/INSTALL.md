@@ -39,6 +39,10 @@ voice and rules there. That file stays on your machine, so the skills can stay g
 `claude-code-guards` reads JSON instead, at `~/.config/skillknot/claude-code-guards.json`. See
 its [skill](../plugins/claude-code-guards/skills/claude-code-guards/SKILL.md).
 
+`claude-code-session-meter` reads JSON too, at
+`~/.config/skillknot/claude-code-session-meter.json`, and its status line needs one line in your
+settings. See its [skill](../plugins/claude-code-session-meter/skills/claude-code-session-meter/SKILL.md).
+
 ## 4. Harden a project's Claude Code settings
 
 1. Copy [settings.hardened.json](../plugins/claude-code-guards/templates/settings.hardened.json)
@@ -52,7 +56,8 @@ The sandbox is the real boundary. Deny rules on command prefixes only slow mista
 ## 5. Check the guards work
 
 In a scratch repo, ask the agent to run `git push`. You should get a prompt that lists the repo,
-target, commits and files. Ask it to read `~/.ssh/config`: the secret guard should refuse.
+target, commits and files. Ask it to read `~/.ssh/config`: the secret guard should refuse. Ask it to
+run `git reset --hard` there: the destructive check should ask first.
 
 ## Contributing
 
