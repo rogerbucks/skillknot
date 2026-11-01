@@ -1,0 +1,8 @@
+{
+  "name": "context-budget",
+  "description": "Measure an agent setup's always-loaded context and hook latency against budgets, and fix by relocating",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

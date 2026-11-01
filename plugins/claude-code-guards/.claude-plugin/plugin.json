@@ -1,0 +1,8 @@
+{
+  "name": "claude-code-guards",
+  "description": "Claude Code hooks that ask before pushes and connector sends, keep secrets out of reach, plus a hardened settings template",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}
