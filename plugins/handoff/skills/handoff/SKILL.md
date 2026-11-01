@@ -39,7 +39,7 @@ report so the user can correct it in one word:
 Read back over the conversation and pull out everything that exists only in chat:
 
 | What came out | Where it goes |
-|---|---|
+| --- | --- |
 | **A decision:** a choice made, with the options turned down | A decision record, **with what was rejected and why**. One file per decision |
 | **A finding:** something now known that was not | The note or document it concerns, dated |
 | **A next step or recommendation** | **A task: one task, one file** or one tracker item. A checkbox line is a step inside a task, never a task |
@@ -67,7 +67,7 @@ When unsure, add **one line to an existing note** rather than a new note.
 ## 3. Mark where each item came from
 
 **The user must tell "the agent suggested this" from "I decided this" at a glance.** Group new
-items under a dated heading, or add a short "suggested in session, <date>" clause. Unmarked
+items under a dated heading, or add a short "suggested in session, with the date" clause. Unmarked
 suggestions piling up as tasks is how a task list stops being trusted.
 
 **Size each task by one test:** could a fresh session, holding nothing but this task, pick it up

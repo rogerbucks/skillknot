@@ -28,7 +28,7 @@ Each skill reads `~/.config/skillknot/<skill>.md` if it exists. Put your own fol
 voice and rules there. That file stays on your machine, so the skills can stay general.
 
 | Skill | Useful things to put in its overlay |
-|---|---|
+| --- | --- |
 | `handoff` | Where decisions and tasks live, and the checker to run at the end |
 | `polish-document` | House style, required frontmatter, where polished files go |
 | `document-bundle` | Registry location, audiences, converter |

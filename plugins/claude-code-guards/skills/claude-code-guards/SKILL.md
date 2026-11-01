@@ -11,7 +11,7 @@ Three hooks run before each tool call. None of them edits anything. Each one eit
 silent, asks the person, or refuses the call.
 
 | Guard | Fires on | Does |
-|---|---|---|
+| --- | --- | --- |
 | **outward** | `git push`, and `gh` commands that write | Asks every time it sees a push, and shows the repo, target, commits and files. Asks for a `gh` write to a repo you do not own, and for any release |
 | **secret** | Every tool | Refuses a call that names a secret-shaped path, such as `.ssh/`, `.env` or a folder with "secret" in its name. Asks before credential tools run, and before text that looks like a live key is written |
 | **connector** | Connector (MCP) tools, and web tools | Asks before a connector sends, shares or deletes something. After the session has read mail or messages, also asks before anything that could carry that text out |

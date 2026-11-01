@@ -1,6 +1,8 @@
 {
   "name": "handoff",
   "description": "End a working session with nothing left only in the chat: sweep, persist, release, verify, report",
-  "author": { "name": "rogerbucks" },
+  "author": {
+    "name": "rogerbucks"
+  },
   "license": "MIT"
 }

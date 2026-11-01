@@ -19,7 +19,7 @@ fields, folders and a voice.
 pictures. Each pass is wasted if a later one moves the furniture.
 
 | Pass | Question | Output |
-|---|---|---|
+| --- | --- | --- |
 | **1 Gaps** | What should be here and is not? | A ranked list of missing sections |
 | **2 Review** | What reads as unfinished? | Fixes, and a short list to raise |
 | **3 Format** | Does it meet standard Markdown? | The rewritten document |
@@ -83,7 +83,7 @@ Raise, do not fix:
 worse than none. Use Mermaid in the document, so it stays searchable and diffable.
 
 | Shape in the document | Diagram |
-|---|---|
+| --- | --- |
 | A cascade or layers | `flowchart TD`, with any feedback edge dotted |
 | A loop: plan, do, check, decide | `flowchart LR` with a decision node |
 | A lifecycle with a stop condition | `flowchart TD`, the failure path dotted |

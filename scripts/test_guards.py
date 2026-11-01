@@ -8,7 +8,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-GUARDS = Path(__file__).resolve().parent.parent / "plugins" / "claude-code-guards" / "scripts"
+GUARDS = (
+    Path(__file__).resolve().parent.parent
+    / "plugins"
+    / "claude-code-guards"
+    / "scripts"
+)
 sys.path.insert(0, str(GUARDS))
 
 import connector_guard
@@ -23,10 +28,20 @@ def hook(script, event, config=None):
     with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
         json.dump(config or {}, handle)
     env = {**os.environ, "SKILLKNOT_GUARDS_CONFIG": handle.name}
-    done = subprocess.run([sys.executable, str(GUARDS / script)], input=json.dumps(event),
-                          capture_output=True, text=True, env=env, check=True)
+    done = subprocess.run(
+        [sys.executable, str(GUARDS / script)],
+        input=json.dumps(event),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=True,
+    )
     os.unlink(handle.name)
-    return json.loads(done.stdout)["hookSpecificOutput"]["permissionDecision"] if done.stdout.strip() else None
+    return (
+        json.loads(done.stdout)["hookSpecificOutput"]["permissionDecision"]
+        if done.stdout.strip()
+        else None
+    )
 
 
 class Outward(unittest.TestCase):
@@ -47,58 +62,144 @@ class Outward(unittest.TestCase):
         self.assertEqual(len(find("git push && git push origin main")), 2)
 
     def test_owner_and_repo_name(self):
-        self.assertEqual(outward_confirm.owner_of("https://github.com/acme/tool.git"), "acme")
-        self.assertEqual(outward_confirm.owner_of("git" + AT + "github.com:acme/tool.git"), "acme")
+        self.assertEqual(
+            outward_confirm.owner_of("https://github.com/acme/tool.git"), "acme"
+        )
+        self.assertEqual(
+            outward_confirm.owner_of("git" + AT + "github.com:acme/tool.git"), "acme"
+        )
         self.assertEqual(outward_confirm.owner_of("acme/tool"), "acme")
-        self.assertEqual(outward_confirm.repo_name("https://user:token" + AT + "github.com/acme/tool.git"), "acme/tool on github.com")
+        self.assertEqual(
+            outward_confirm.repo_name(
+                "https://user:token" + AT + "github.com/acme/tool.git"
+            ),
+            "acme/tool on github.com",
+        )
 
     def test_gh_writes(self):
         acts = outward_confirm.gh_acts("gh pr create -R acme/tool --fill", "/work")
         self.assertEqual(acts, [("gh pr create", "acme", False)])
-        self.assertEqual(outward_confirm.gh_acts("gh pr list -R acme/tool", "/work"), [])
-        self.assertEqual(outward_confirm.gh_acts("gh api repos/acme/tool/issues", "/work"), [])
-        self.assertTrue(outward_confirm.gh_acts("gh api -X POST repos/acme/tool/releases", "/work")[0][2])
+        self.assertEqual(
+            outward_confirm.gh_acts("gh pr list -R acme/tool", "/work"), []
+        )
+        self.assertEqual(
+            outward_confirm.gh_acts("gh api repos/acme/tool/issues", "/work"), []
+        )
+        self.assertTrue(
+            outward_confirm.gh_acts("gh api -X POST repos/acme/tool/releases", "/work")[
+                0
+            ][2]
+        )
 
     def test_hook_asks_on_push_and_foreign_gh(self):
         with tempfile.TemporaryDirectory() as repo:
-            run = lambda *a: subprocess.run(["git", "-C", repo, *a], capture_output=True, check=True)
+            run = lambda *a: subprocess.run(
+                ["git", "-C", repo, *a], capture_output=True, check=True
+            )
             run("init", "-q")
             run("remote", "add", "origin", "https://github.com/acme/tool.git")
             Path(repo, "a.txt").write_text("a")
             run("add", "a.txt")
-            run("-c", "user.name=t", "-c", "user.email=t@example.com", "commit", "-qm", "first")
-            summary = outward_confirm.summarise(outward_confirm.pushes_in("git push origin HEAD", repo)[0])
+            run(
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@example.com",
+                "commit",
+                "-qm",
+                "first",
+            )
+            summary = outward_confirm.summarise(
+                outward_confirm.pushes_in("git push origin HEAD", repo)[0]
+            )
             self.assertIn("acme/tool on github.com", summary)
             self.assertIn("Commits (1)", summary)
             self.assertIn("a.txt", summary)
-            event = {"tool_name": "Bash", "tool_input": {"command": "git push"}, "cwd": repo}
+            event = {
+                "tool_name": "Bash",
+                "tool_input": {"command": "git push"},
+                "cwd": repo,
+            }
             self.assertEqual(hook("outward_confirm.py", event), "ask")
-        gh = {"tool_name": "Bash", "tool_input": {"command": "gh issue create -R acme/tool"}, "cwd": "/"}
+        gh = {
+            "tool_name": "Bash",
+            "tool_input": {"command": "gh issue create -R acme/tool"},
+            "cwd": "/",
+        }
         self.assertEqual(hook("outward_confirm.py", gh), "ask")
-        self.assertIsNone(hook("outward_confirm.py", gh, {"own_github_owners": ["acme"]}))
-        self.assertIsNone(hook("outward_confirm.py", {"tool_name": "Bash", "tool_input": {"command": "ls"}}))
+        self.assertIsNone(
+            hook("outward_confirm.py", gh, {"own_github_owners": ["acme"]})
+        )
+        self.assertIsNone(
+            hook(
+                "outward_confirm.py",
+                {"tool_name": "Bash", "tool_input": {"command": "ls"}},
+            )
+        )
 
 
 class Secret(unittest.TestCase):
     def test_paths(self):
-        for bad in ("/x/.ssh/id_ed25519", "./.env", "/x/.env.local", "/x/My Secrets/a.md", "/x/key.pem",
-                    "/x/.aws/credentials", "~/secrets"):
+        for bad in (
+            "/x/.ssh/id_ed25519",
+            "./.env",
+            "/x/.env.local",
+            "/x/My Secrets/a.md",
+            "/x/key.pem",
+            "/x/.aws/credentials",
+            "~/secrets",
+        ):
             self.assertTrue(secret_guard.secret_path(bad), bad)
-        for good in ("/x/.env.example", "/x/secret_guard.py", "/x/notes.md", "/x/environment.md"):
+        for good in (
+            "/x/.env.example",
+            "/x/secret_guard.py",
+            "/x/notes.md",
+            "/x/environment.md",
+        ):
             self.assertFalse(secret_guard.secret_path(good), good)
         self.assertFalse(secret_guard.secret_path("/x/.env", allowed=("/x/.env",)))
 
     def test_hook(self):
         read = {"tool_name": "Read", "tool_input": {"file_path": "/x/.ssh/id_rsa"}}
         self.assertEqual(hook("secret_guard.py", read), "deny")
-        self.assertIsNone(hook("secret_guard.py", read, {"allow_paths": ["/x/.ssh/id_rsa"]}))
-        self.assertEqual(hook("secret_guard.py", {"tool_name": "Bash", "tool_input": {"command": "cat .env"}}), "deny")
-        self.assertEqual(hook("secret_guard.py", {"tool_name": "Bash", "tool_input": {"command": "op item get x"}}), "ask")
-        self.assertIsNone(hook("secret_guard.py", {"tool_name": "Bash", "tool_input": {"command": "security list-keychains"}}))
+        self.assertIsNone(
+            hook("secret_guard.py", read, {"allow_paths": ["/x/.ssh/id_rsa"]})
+        )
+        self.assertEqual(
+            hook(
+                "secret_guard.py",
+                {"tool_name": "Bash", "tool_input": {"command": "cat .env"}},
+            ),
+            "deny",
+        )
+        self.assertEqual(
+            hook(
+                "secret_guard.py",
+                {"tool_name": "Bash", "tool_input": {"command": "op item get x"}},
+            ),
+            "ask",
+        )
+        self.assertIsNone(
+            hook(
+                "secret_guard.py",
+                {
+                    "tool_name": "Bash",
+                    "tool_input": {"command": "security list-keychains"},
+                },
+            )
+        )
         key = "AKIA" + "ABCDEFGHIJKLMNOP"
-        write = {"tool_name": "Write", "tool_input": {"file_path": "/x/a.py", "content": f"k = '{key}'"}}
+        write = {
+            "tool_name": "Write",
+            "tool_input": {"file_path": "/x/a.py", "content": f"k = '{key}'"},
+        }
         self.assertEqual(hook("secret_guard.py", write), "ask")
-        self.assertIsNone(hook("secret_guard.py", {"tool_name": "Read", "tool_input": {"file_path": "/x/a.md"}}))
+        self.assertIsNone(
+            hook(
+                "secret_guard.py",
+                {"tool_name": "Read", "tool_input": {"file_path": "/x/a.md"}},
+            )
+        )
         self.assertIsNone(hook("secret_guard.py", read, {"off": ["secret"]}))
 
 
@@ -108,7 +209,10 @@ class Connector(unittest.TestCase):
         marker = connector_guard.marker(session)
         if os.path.exists(marker):
             os.unlink(marker)
-        call = lambda tool: hook("connector_guard.py", {"tool_name": tool, "tool_input": {}, "session_id": session})
+        call = lambda tool: hook(
+            "connector_guard.py",
+            {"tool_name": tool, "tool_input": {}, "session_id": session},
+        )
         try:
             self.assertEqual(call("mcp__mail__send_email"), "ask")
             self.assertEqual(call("mcp__files__delete_file"), "ask")

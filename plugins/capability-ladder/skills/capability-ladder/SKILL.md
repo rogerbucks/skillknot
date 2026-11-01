@@ -22,7 +22,7 @@ scheduled jobs live, and where decisions are recorded.
 Check every place before calling anything missing:
 
 | Place | How to look |
-|---|---|
+| --- | --- |
 | **Project scripts** | The script index or README. Search by what a script does, not what you would have named it |
 | **Skills** | The installed skill list, and the project's own skills folder |
 | **Connected tools and connectors** | The tool list now, then any registry of connectors that exist but are not connected |
@@ -32,7 +32,7 @@ Check every place before calling anything missing:
 ## 2. Name the kind of gap
 
 | Kind | Answer |
-|---|---|
+| --- | --- |
 | **It exists and you did not know** | Use it. Not a gap: a lookup miss, worth one line in the report |
 | **It exists but is not connected** | An authorisation proposal. The user's click, not yours |
 | **It can be composed from what is here** | Compose it. A script plus a skill is not a purchase |

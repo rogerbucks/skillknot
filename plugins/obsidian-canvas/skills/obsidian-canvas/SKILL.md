@@ -45,7 +45,7 @@ not invent one.**
 For each node, ask whether a note exists:
 
 | Answer | Node |
-|---|---|
+| --- | --- |
 | Yes | `file` node, with the path relative to the vault root |
 | No, but it should | `text` node: a `## Name` heading, a one-line description, then `[[Name]]`, so a click creates the note |
 | No, it is a label or grouping | `text` node, or a `group` with a `label` |
@@ -91,7 +91,7 @@ coordinates**, so round every value.
 Check these, by reading the JSON:
 
 | Check | Why |
-|---|---|
+| --- | --- |
 | **No edge passes through a node it does not join** | A crossing count misses this, and it makes a fan-out look like a chain |
 | **Every `file` node points at an existing file** | A missing target fails silently |
 | **Coordinates are whole numbers and ids are unique** | Required by the JSON Canvas format |
@@ -104,7 +104,7 @@ miss is not proof, so **look at the rendered canvas** too.
 ## What a canvas can hold
 
 | Want | Node |
-|---|---|
+| --- | --- |
 | A note, or one section of it | `file`, plus `subpath: "#Heading"` for a section |
 | An image or diagram | `file` pointing at an `.svg` (sharp at any zoom, and searchable) or `.png` |
 | A web page | `link` with a `url` |

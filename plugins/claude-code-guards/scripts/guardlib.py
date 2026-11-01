@@ -21,7 +21,9 @@ SEPARATORS = re.compile(r"&&|\|\||[;|\n]")
 
 def load_config(path=None):
     """The overlay as a dict, or {} when it is missing or unreadable."""
-    target = Path(path) if path else Path(os.environ.get("SKILLKNOT_GUARDS_CONFIG", OVERLAY))
+    target = (
+        Path(path) if path else Path(os.environ.get("SKILLKNOT_GUARDS_CONFIG", OVERLAY))
+    )
     try:
         return json.loads(target.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -72,11 +74,17 @@ def read_input():
 
 def answer(decision, reason):
     """Prints a PreToolUse decision: "ask", "deny" or "allow"."""
-    print(json.dumps({"hookSpecificOutput": {
-        "hookEventName": "PreToolUse",
-        "permissionDecision": decision,
-        "permissionDecisionReason": reason,
-    }}))
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": decision,
+                    "permissionDecisionReason": reason,
+                }
+            }
+        )
+    )
 
 
 def run(guard_name, decide):
@@ -89,7 +97,10 @@ def run(guard_name, decide):
     try:
         result = decide(event, config)
     except Exception as error:  # noqa: BLE001 - a broken guard must not wave a call through
-        result = ("ask", f"{guard_name}: the guard failed ({type(error).__name__}), so a person should check this call.")
+        result = (
+            "ask",
+            f"{guard_name}: the guard failed ({type(error).__name__}), so a person should check this call.",
+        )
     if result:
         answer(*result)
     return 0

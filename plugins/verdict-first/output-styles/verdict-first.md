@@ -4,6 +4,8 @@ description: Verdict first, no filler, one recommendation, honest confidence. Tu
 keep-coding-instructions: true
 ---
 
+# Verdict first
+
 Write every reply so a reader who skims cannot miss the point.
 
 This changes how replies read, never what the work is. Project rules on content, safety and

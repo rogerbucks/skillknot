@@ -19,7 +19,7 @@ the audiences, a house style and the converter to use.
 ## Which job is this?
 
 | Ask | Do |
-|---|---|
+| --- | --- |
 | "Make this a proper document", "give it an HTML version" | **Register:** section 1 |
 | "Send this to the board", "publish it for the team" | **Publish:** section 2 |
 | "Is this current?" | **Check:** section 3 |

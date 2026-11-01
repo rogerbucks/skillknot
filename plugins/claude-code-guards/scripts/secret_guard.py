@@ -26,18 +26,54 @@ SECRET_PART = re.compile(
 # Example files are fine to read: .env.example, .env.sample, .env.template.
 EXAMPLE = re.compile(r"\.(example|sample|template|dist)$", re.IGNORECASE)
 # Commands that fetch or reveal credentials.
-CREDENTIAL_TOOLS = re.compile(
-    r"^(op|bw|lpass|pass|gopass|vault|aws-vault|security)$"
-)
-READERS = {"cat", "less", "more", "head", "tail", "cp", "mv", "scp", "rsync", "tar", "zip", "base64", "xxd",
-           "od", "strings", "open", "source", ".", "grep", "rg", "sed", "awk", "curl", "nc"}
-SECURITY_READS = {"find-generic-password", "find-internet-password", "dump-keychain", "export"}
+CREDENTIAL_TOOLS = re.compile(r"^(op|bw|lpass|pass|gopass|vault|aws-vault|security)$")
+READERS = {
+    "cat",
+    "less",
+    "more",
+    "head",
+    "tail",
+    "cp",
+    "mv",
+    "scp",
+    "rsync",
+    "tar",
+    "zip",
+    "base64",
+    "xxd",
+    "od",
+    "strings",
+    "open",
+    "source",
+    ".",
+    "grep",
+    "rg",
+    "sed",
+    "awk",
+    "curl",
+    "nc",
+}
+SECURITY_READS = {
+    "find-generic-password",
+    "find-internet-password",
+    "dump-keychain",
+    "export",
+}
 # Text that looks like a live credential.
 CREDENTIAL_TEXT = re.compile(
     r"(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}"
     r"|xox[abpr]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----)"
 )
-PATH_KEYS = ("file_path", "path", "notebook_path", "directory", "dir", "target", "source", "destination")
+PATH_KEYS = (
+    "file_path",
+    "path",
+    "notebook_path",
+    "directory",
+    "dir",
+    "target",
+    "source",
+    "destination",
+)
 TEXT_KEYS = ("content", "new_string", "new_source", "text", "body")
 
 
@@ -49,7 +85,9 @@ def secret_path(path, allowed=()):
 
 
 def paths_in(tool_input):
-    found = [str(tool_input[k]) for k in PATH_KEYS if isinstance(tool_input.get(k), str)]
+    found = [
+        str(tool_input[k]) for k in PATH_KEYS if isinstance(tool_input.get(k), str)
+    ]
     for value in tool_input.values():
         if isinstance(value, list):
             found += [v for v in value if isinstance(v, str) and "/" in v]
@@ -61,12 +99,19 @@ def command_findings(command, cwd, allowed=()):
     findings = []
     for parts, _ in segments(command, cwd):
         tool = parts[0].rsplit("/", 1)[-1]
-        if CREDENTIAL_TOOLS.match(tool) and (tool != "security" or (len(parts) > 1 and parts[1] in SECURITY_READS)):
+        if CREDENTIAL_TOOLS.match(tool) and (
+            tool != "security" or (len(parts) > 1 and parts[1] in SECURITY_READS)
+        ):
             findings.append(("ask", f"runs `{tool}`, which can reveal credentials"))
         for word in parts[1:]:
             for token in re.split(r"[=:,]", word):
                 if secret_path(token, allowed):
-                    findings.append(("deny" if tool in READERS else "ask", "names a secret-shaped path"))
+                    findings.append(
+                        (
+                            "deny" if tool in READERS else "ask",
+                            "names a secret-shaped path",
+                        )
+                    )
                     break
     return findings
 
@@ -77,22 +122,35 @@ def decide(event, config):
     allowed = tuple(config.get("allow_paths", []))
     findings = []
     if tool == "Bash":
-        findings += command_findings(data.get("command", ""), event.get("cwd") or ".", allowed)
+        findings += command_findings(
+            data.get("command", ""), event.get("cwd") or ".", allowed
+        )
     else:
         if any(secret_path(p, allowed) for p in paths_in(data)):
             findings.append(("deny", "names a secret-shaped path"))
         pattern = data.get("pattern") or data.get("glob") or ""
-        if isinstance(pattern, str) and re.search(r"secret|\.env\b|\.ssh|\.pem|id_rsa", pattern, re.IGNORECASE):
+        if isinstance(pattern, str) and re.search(
+            r"secret|\.env\b|\.ssh|\.pem|id_rsa", pattern, re.IGNORECASE
+        ):
             findings.append(("ask", "searches for secret-shaped files"))
-        if any(isinstance(data.get(k), str) and CREDENTIAL_TEXT.search(data[k]) for k in TEXT_KEYS):
+        if any(
+            isinstance(data.get(k), str) and CREDENTIAL_TEXT.search(data[k])
+            for k in TEXT_KEYS
+        ):
             findings.append(("ask", "writes text that looks like a live credential"))
     if not findings:
         return None
     decision = "deny" if any(d == "deny" for d, _ in findings) else "ask"
     rules = "; ".join(sorted({rule for _, rule in findings}))
-    tail = (" Add the exact path to allow_paths in ~/.config/skillknot/claude-code-guards.json if it is safe."
-            if decision == "deny" else "")
-    return decision, f"Secret guard: this call {rules}.{tail} Do not reword or re-encode the call to get past this."
+    tail = (
+        " Add the exact path to allow_paths in ~/.config/skillknot/claude-code-guards.json if it is safe."
+        if decision == "deny"
+        else ""
+    )
+    return (
+        decision,
+        f"Secret guard: this call {rules}.{tail} Do not reword or re-encode the call to get past this.",
+    )
 
 
 if __name__ == "__main__":

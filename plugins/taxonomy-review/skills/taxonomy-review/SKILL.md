@@ -28,7 +28,7 @@ For each group, count the items, and note:
 ## 2. Read the signals honestly
 
 | Signal | Means | Confidence |
-|---|---|---|
+| --- | --- | --- |
 | Merge candidate that **shares tags** | Related content | Reasonable |
 | Merge candidate with **name overlap only** | The names look alike | **Weak, and say so** |
 | Merge candidate with **neither** | A person must read it | None |

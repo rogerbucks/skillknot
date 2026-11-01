@@ -18,7 +18,7 @@ budgets, and where results are recorded.
 ## What to measure, and the starting budgets
 
 | Measure | What it is | Starting budget |
-|---|---|---|
+| --- | --- | --- |
 | **Always-loaded context** | Every instruction file read on every turn: the main agent file, imported files, output style | 13,000 tokens |
 | **Session-start context** | What is read once per session: indexes, memory, start-up hook output | 22,000 tokens |
 | **Per-turn hook time** | All hooks that run on every turn or stop, added up | 3 seconds |
@@ -41,7 +41,7 @@ Save each run's numbers with the date, so the next run can show the change.
 ## When to run
 
 | Trigger | Run |
-|---|---|
+| --- | --- |
 | **After editing always-loaded instructions** | Everything. These are the numbers you just changed |
 | **After adding or changing a hook** | Everything. Latency is the point |
 | **After adding a rule or a skill** | Index and drift checks |

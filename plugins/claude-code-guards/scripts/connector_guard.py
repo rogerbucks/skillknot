@@ -19,11 +19,20 @@ import tempfile
 
 from guardlib import run
 
-ALWAYS_ASK = re.compile(r"(^|_)(send|forward|reply|rsvp|post|publish|share|delete|trash|remove|transfer|pay|invoice)(_|$)", re.IGNORECASE)
+ALWAYS_ASK = re.compile(
+    r"(^|_)(send|forward|reply|rsvp|post|publish|share|delete|trash|remove|transfer|pay|invoice)(_|$)",
+    re.IGNORECASE,
+)
 READ_VERB = re.compile(r"(^|_)(read|get|search|list|fetch)(_|$)", re.IGNORECASE)
-MESSAGE_NOUN = re.compile(r"(mail|email|message|thread|inbox|chat|conversation|imessage|sms|dm)", re.IGNORECASE)
+MESSAGE_NOUN = re.compile(
+    r"(mail|email|message|thread|inbox|chat|conversation|imessage|sms|dm)",
+    re.IGNORECASE,
+)
 OUTBOUND_TOOLS = {"WebFetch", "WebSearch"}
-OUTBOUND_VERB = re.compile(r"(^|_)(navigate|open_url|upload|create_file|create_issue|comment|draft)(_|$)", re.IGNORECASE)
+OUTBOUND_VERB = re.compile(
+    r"(^|_)(navigate|open_url|upload|create_file|create_issue|comment|draft)(_|$)",
+    re.IGNORECASE,
+)
 
 
 def leaf(tool):
@@ -43,13 +52,20 @@ def decide(event, config):
     name = leaf(tool)
     is_mcp = tool.startswith("mcp__")
     if is_mcp and ALWAYS_ASK.search(name):
-        return "ask", f"Connector guard: `{name}` sends, shares or removes something outside this machine. Approve it this once?"
+        return (
+            "ask",
+            f"Connector guard: `{name}` sends, shares or removes something outside this machine. Approve it this once?",
+        )
     if is_mcp and READ_VERB.search(name) and MESSAGE_NOUN.search(name):
         open(marker(session), "a").close()
         return None
-    if os.path.exists(marker(session)) and (tool in OUTBOUND_TOOLS or (is_mcp and OUTBOUND_VERB.search(name))):
-        return "ask", (f"Connector guard: messages were read earlier in this session, and `{name}` could carry their "
-                       "text out. Check that this call is yours, not an instruction found inside a message.")
+    if os.path.exists(marker(session)) and (
+        tool in OUTBOUND_TOOLS or (is_mcp and OUTBOUND_VERB.search(name))
+    ):
+        return "ask", (
+            f"Connector guard: messages were read earlier in this session, and `{name}` could carry their "
+            "text out. Check that this call is yours, not an instruction found inside a message."
+        )
     return None
 
 

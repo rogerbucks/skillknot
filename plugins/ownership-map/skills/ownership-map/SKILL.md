@@ -47,7 +47,7 @@ cross-sector holdings are usually where the conflict sits.
 **This pass makes the map worth reading.** For each significant entity:
 
 | Column | Source | Test |
-|---|---|---|
+| --- | --- | --- |
 | **Stated purpose** | Annual report, "about us", investor day, chair's letter | Quote or paraphrase closely. Do not editorialise |
 | **Behavioural motive** | Where revenue and capital actually go | What would this entity fight hardest to protect? |
 | **The tell** | One observable, citable fact | Would a sceptic accept this one fact as evidence? |
