@@ -64,6 +64,24 @@ In a scratch repo, ask the agent to run `git push`. You should get a prompt that
 target, commits and files. Ask it to read `~/.ssh/config`: the secret guard should refuse. Ask it to
 run `git reset --hard` there: the destructive check should ask first.
 
+## 6. Keep everything current on each push (optional, macOS)
+
+From a clone of this repo, run once:
+
+```bash
+python3 scripts/autoupdate.py --install-launchd
+```
+
+It adds a background job that runs at login and every 15 minutes. Each run asks GitHub for the
+newest commit on `main` and stops if nothing changed. When `main` has moved, it refreshes the
+skillknot marketplace, updates every skillknot plugin and installs any new ones. It only touches
+skillknot plugins. A restart of Claude Code picks up the changes.
+
+The job runs its own copy of the script, from `~/.local/share/skillknot`, so a later push never
+changes what runs on your Mac until you run the install command again. The log is
+`~/.local/state/skillknot/autoupdate.log`. Run `python3 scripts/autoupdate.py --force` to update
+now, or `python3 scripts/autoupdate.py --uninstall-launchd` to stop it. Plugins stay installed.
+
 ## Contributing
 
 See "Add a skill" in the [README](../README.md). Turn on the local check with
