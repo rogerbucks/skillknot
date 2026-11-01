@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # the branch's own head: GitHub's trial merge commit carries the account's display name
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
           fetch-depth: 0
       - run: python3 -m unittest discover -s scripts
@@ -64,4 +66,4 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - run: docker run --rm -v "$PWD:/repo" -w /repo lycheeverse/lychee:lychee-v0.24.2 --no-progress --accept 200,403,429 './**/*.md'
+      - run: docker run --rm -v "$PWD:/repo" -w /repo lycheeverse/lychee:0.24.2 --no-progress --accept 200,403,429 './**/*.md'
