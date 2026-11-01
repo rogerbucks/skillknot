@@ -54,6 +54,6 @@ def read_json(path):
 def write_json(path, data):
     """Writes through a temporary file, so a reader never sees half a file."""
     path = Path(path)
-    spare = path.with_suffix(".tmp")
+    spare = path.with_suffix(f".{os.getpid()}.tmp")
     spare.write_text(json.dumps(data), encoding="utf-8")
     os.replace(spare, path)

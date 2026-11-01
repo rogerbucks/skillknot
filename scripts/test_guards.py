@@ -247,6 +247,7 @@ class Destructive(unittest.TestCase):
             self.assertFalse(find(good), good)
         self.assertFalse(find("rm -rf node_modules dist/", ("node_modules", "dist")))
         self.assertTrue(find("rm -rf node_modules src", ("node_modules",)))
+        self.assertEqual(len(find('psql -c "DROP TABLE a; DELETE FROM b;"')), 2)
 
     def test_hook(self):
         bash = lambda c: {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": "/"}

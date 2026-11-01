@@ -63,8 +63,9 @@ so you can install only the ones you want.
   it well, test that on a sample, and report the saving. Vendor neutral
 - **`context-budget`:** measure always-loaded context and hook latency against budgets, and fix a
   breach by moving material, not deleting it
-- **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and connector sends, flag prompt injection, and keep
-  secrets out of reach, plus a hardened `settings.json` template. **Claude Code only**
+- **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and
+  connector sends, flag prompt injection, and keep secrets out of reach, plus a hardened
+  `settings.json` template. **Claude Code only**
 - **`claude-code-session-meter`:** a status line showing branch, unpushed work, context, cost and
   time, a cap that warns when a session runs long or costly, and a reminder to hand off before
   stopping. **Claude Code only**

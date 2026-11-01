@@ -92,6 +92,10 @@ it on.
 
 - The guards read the plain spellings of a command. A program that pushes or reads a key by
   itself is not seen, and the sandbox and the person's review cover that
+- `rebuildable` matches folder names, not paths. `rm -rf /any/where/node_modules` runs without a
+  prompt, so list only names you would happily lose anywhere
+- The SQL check catches the common forms of `DROP`, `TRUNCATE` and a `DELETE` with no `WHERE`. An
+  unusual form, such as a `DELETE` with only a `LIMIT`, can pass unseen
 - The connector guard's "messages were read" mark lasts for the session. It is an empty file in
   the system temp folder, named by a hash of the session id
 - Hooks run only in Claude Code. Other agents need their own controls
