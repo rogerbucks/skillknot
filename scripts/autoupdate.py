@@ -18,6 +18,7 @@ not the repo's, so a later push never changes what runs on the machine without a
 import argparse
 import json
 import os
+import plistlib
 import shutil
 import subprocess
 import sys
@@ -147,30 +148,16 @@ def check_and_update(force=False, runner=run, log=write_log):
 
 
 def agent_plist(program, path_value):
-    args = "".join(f"\n    <string>{part}</string>" for part in program)
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>{LABEL}</string>
-  <key>ProgramArguments</key>
-  <array>{args}
-  </array>
-  <key>EnvironmentVariables</key>
-  <dict>
-    <key>PATH</key>
-    <string>{path_value}</string>
-  </dict>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>StartInterval</key>
-  <integer>{INTERVAL_SECONDS}</integer>
-  <key>ProcessType</key>
-  <string>Background</string>
-</dict>
-</plist>
-"""
+    """Returns the launchd job file. plistlib escapes every value."""
+    job = {
+        "Label": LABEL,
+        "ProgramArguments": program,
+        "EnvironmentVariables": {"PATH": path_value},
+        "RunAtLoad": True,
+        "StartInterval": INTERVAL_SECONDS,
+        "ProcessType": "Background",
+    }
+    return plistlib.dumps(job).decode()
 
 
 def install_launchd():

@@ -120,6 +120,10 @@ class PlistTest(unittest.TestCase):
         self.assertIn("<key>RunAtLoad</key>", text)
         self.assertIn("<string>/x/autoupdate.py</string>", text)
 
+    def test_plist_escapes_odd_paths(self):
+        text = autoupdate.agent_plist(["/a&b/<py>"], "/bin")
+        self.assertIn("/a&amp;b/&lt;py&gt;", text)
+
 
 if __name__ == "__main__":
     unittest.main()
