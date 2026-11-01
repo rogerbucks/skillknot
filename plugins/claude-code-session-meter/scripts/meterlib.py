@@ -6,7 +6,8 @@ Writes: nothing itself. The callers write JSON files in the system temp folder, 
 the session id, so no session id or path appears in a file name.
 
 The overlay is optional JSON at ~/.config/skillknot/claude-code-session-meter.json, for example:
-  {"max_usd": 5, "max_minutes": 120, "max_turns": 100, "warn_at": 0.8, "hard_stop": false}
+  {"max_usd": 5, "max_minutes": 120, "max_turns": 100, "warn_at": 0.8, "hard_stop": false,
+   "handoff_after_edits": 10, "handoff_after_minutes": 20}
 """
 
 import hashlib
@@ -22,6 +23,8 @@ DEFAULTS = {
     "max_turns": 100,
     "warn_at": 0.8,
     "hard_stop": False,
+    "handoff_after_edits": 10,
+    "handoff_after_minutes": 20,
 }
 
 

@@ -1,5 +1,5 @@
 {
-  "description": "Session cap: counts prompts and reads the status line's last cost and time, then warns, or once stops a prompt, when a limit is passed.",
+  "description": "Session cap and handoff reminder. The cap counts prompts and reads the status line's last cost and time, then warns, or once holds a prompt. The reminder shows one line at the end of a turn after a stretch of edits with no handoff.",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -7,6 +7,17 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/session_cap.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/handoff_nudge.py\"",
             "timeout": 10
           }
         ]
