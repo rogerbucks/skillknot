@@ -9,7 +9,7 @@ Usage:
   python3 advise.py PATH.jsonl          one session record
 Options: --window N (context size in tokens, default 200000), --json (machine-readable output).
 Writes: nothing. It reads the record and prints a report. It never prints file contents, only
-names, counts and sizes.
+names, counts, sizes and the start of a shell command.
 
 Sizes are estimates: about 4 characters to a token. The context figure comes from the last reply's
 own token counts when the record has them.
@@ -220,7 +220,7 @@ def analyse(calls, usage, compactions, window):
                 longest * 500,
                 "Long search run",
                 (
-                    f"{longest} searches and reads in a row with no edit. A research subagent would do "
+                    f"{longest} searches and reads in a row with no other step. A research subagent would do "
                     "this in its own context and hand back only the answer."
                 ),
             )

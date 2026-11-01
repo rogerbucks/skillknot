@@ -5,7 +5,7 @@ throughout. This file holds the reasoning that the code cannot.
 
 ## What is live on `main`
 
-**20 plugins, one skill each.** The README lists them all. In groups:
+**21 plugins, one skill each.** The README lists them all. In groups:
 
 - **Improve and review:** `gauntlet` (builder and critic rounds against a bar), `adversarial-review`
   (a hostile expert panel by region, phase and industry), `private-words` (keeps private words out
@@ -17,7 +17,8 @@ throughout. This file holds the reasoning that the code cannot.
 - **Research and risk:** `ownership-map`, `read-only-researcher`, `taxonomy-review`,
   `threat-model` (what could go wrong, cheapest fixes first, report only)
 - **Running an agent setup:** `capability-ladder`, `context-budget`, `model-picker` (the cheapest
-  model tier that does each step well)
+  model tier that does each step well), `claude-code-context-advisor` (reads a session's record
+  and says what filled the context, and when to compact or start fresh)
 - **Claude Code hooks:** `claude-code-guards` asks before pushes, destructive commands and
   connector sends, refuses secret paths, and warns when a web or connector result tries to give the
   agent orders. `claude-code-session-meter` adds a status line, a cost, time and prompt cap, and a
@@ -42,10 +43,13 @@ automated review, but none has run in a real session yet.
    instructions". Each should ask, refuse or warn as its skill says
 2. **Set up the status line** by hand, as the `claude-code-session-meter` skill describes. A
    plugin cannot set it. Check that the cost and context figures match Claude Code's own
-3. **Run each new skill as a stranger:** `slide-storyline`, `chart-picker`, `design-brief`,
+3. **Run the context advisor** with `--latest` in a real project. It finds the session record by
+   turning the folder path into a name, with `/` and `.` made into `-`. The `/` part matches a
+   live record; check the `.` part on a folder whose path has a dot
+4. **Run each new skill as a stranger:** `slide-storyline`, `chart-picker`, `design-brief`,
    `threat-model` and `model-picker`. Paper runs earn their keep: the one for `private-words`
    found a word leaking through a printed file name
-4. **Known small gaps,** left on purpose: the tripwire can flag an ordinary line that starts with
+5. **Known small gaps,** left on purpose: the tripwire can flag an ordinary line that starts with
    "System:", and the handoff reminder treats any skill call that mentions "handoff" as a handoff
 
 ## How to ship a change here
@@ -94,10 +98,6 @@ automated review, but none has run in a real session yet.
   the display name and would fail the check
 
 ## What to build next
-
-**A context advisor is being built next:** it reads a session's record and says which big files
-were read whole when a section would do, what was read twice, when to compact or start fresh, and
-when a cheaper model or a subagent would do.
 
 A script should take every step that needs no judgement. These five `gauntlet` scripts are
 proposals, and none has been built or run. Savings would be estimates, drawn from one pilot.

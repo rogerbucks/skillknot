@@ -19,7 +19,7 @@ reading whole files, reading them twice, and letting commands print far more tha
 | **A big file read in full** (over ~8,000 tokens) | Most of it was never needed, and it stays for the rest of the session | Search first, then read only the lines you need |
 | **A file read again with no edit between** | The first copy is still in context, so the second is pure cost | Refer back to the first read |
 | **Heavy tool output** (over ~10,000 tokens) | A long log or listing crowds out the work | Filter at the source: a narrower search, `head`, a quiet flag |
-| **A long run of searches** (15 or more with no edit) | Exploring fills the context with dead ends | Hand the search to a research subagent, which returns only the answer |
+| **A long run of searches** (15 or more with no other step between) | Exploring fills the context with dead ends | Hand the search to a research subagent, which returns only the answer |
 | **Mostly routine steps** | Lookups do not need the strongest model | Give them to a cheaper model or a subagent. The `model-picker` skill shows how to test that |
 | **How full the context is** | Past 60% it is time to plan; past 80% it is time to act | Compact at a natural break, or hand off and start fresh |
 
@@ -63,7 +63,8 @@ read.
 - **Only the main session is read.** Subagent work is in their own context and not counted here
 - **The record format belongs to Claude Code** and can change. If the report looks empty or odd,
   check that the record is a current one before trusting it
-- **The report shows file names and sizes, never contents.** Paths can still be private, so share
-  it with care
+- **The report shows file names and sizes, never file contents.** It does show the first 60
+  characters of a shell command, and paths and commands can still be private, so share it with
+  care
 
 Sources and design notes: [references/sources.md](references/sources.md).
