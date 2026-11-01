@@ -137,9 +137,14 @@ export const register: Register = on => {
 
   on('tool.call', { tool: 'mcp__planning-panel__update_plan' }, async ($, e) => {
     const after = await update($, plan, before => applyChange(before, e as Change))
-    void $.ui.open({ id: PANE, title: TITLE })
+    const { isPlaced } = await $.ui.open({ id: PANE, title: TITLE })
+    // Where nothing draws panes (a headless run, an app view without them), say
+    // so, so the model keeps the plan visible in the chat instead.
+    const where = isPlaced
+      ? 'Panel updated.'
+      : 'No pane can show here, so show this plan in the chat when it changes.'
 
-    return { result: `Panel updated.\n${asMarkdown(after)}` }
+    return { result: `${where}\n${asMarkdown(after)}` }
   }).catch(() => ({ deny: 'The planning panel could not update. Carry on in the chat.' }))
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
