@@ -49,7 +49,8 @@ A skill belongs here if it would work, unchanged and useful, for someone else on
 `main` takes only changes that pass CI. The check looks for home folder paths, personal email
 addresses, secrets, hidden text and a list of private words kept outside the repo, and it tests
 each skill's format. Anything that lets a plugin act, such as a hook, a script or a tool permission,
-needs a reviewed line in `reviewed-powers.json`. Turn on the same check for your own pushes with `git config core.hooksPath .githooks`.
+needs a reviewed line in `reviewed-powers.json`. Run `python3 scripts/tidy.py` to fix file layout. `git config core.hooksPath .githooks` runs that
+before each commit and the same check before each push.
 
 ## Vendors
 

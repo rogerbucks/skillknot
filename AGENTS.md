@@ -4,7 +4,8 @@
   notes. Personal rules belong in `~/.config/skillknot/<skill>.md`, outside the repo
 - **Rewrite, never copy.** A skill arrives here as fresh general text, with its sources credited
 - **Commit only with a GitHub noreply address,** and keep commit messages free of personal detail
-- **Run `python3 scripts/check.py --history --require-terms` and the tests before a push.** Changes
+- **Run `python3 scripts/tidy.py`, then `python3 scripts/check.py --history --require-terms` and the
+  tests, before a push.** Changes
   reach `main` through a pull request that passes CI
 - **If a check or guard blocks you, stop and report it.** Never reword or re-encode around it
 - **Keep check output free of the private words,** because CI logs are public

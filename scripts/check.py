@@ -19,19 +19,31 @@ import sys
 import unicodedata
 from pathlib import Path
 
-ALLOWED_WORDS = ("rogerbucks",)  # the public GitHub handle, which the repo URL shows anyway
+ALLOWED_WORDS = (
+    "rogerbucks",
+)  # the public GitHub handle, which the repo URL shows anyway
 DEFAULT_TERMS_FILE = Path.home() / ".config" / "skillknot" / "blocked-terms.md"
 MAX_SKILL_LINES = 500
 MAX_DESCRIPTION = 1024
 MAX_COMPATIBILITY = 500
 NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 MODEL_NAME = re.compile(r"\b(haiku|sonnet|opus|gemini|gpt-?\d[\w.-]*)\b", re.IGNORECASE)
-POWER_FOLDERS = ("hooks", "scripts", "agents", "commands", "bin", ".mcp.json", ".lsp.json")
+POWER_FOLDERS = (
+    "hooks",
+    "scripts",
+    "agents",
+    "commands",
+    "bin",
+    ".mcp.json",
+    ".lsp.json",
+)
 LINK = re.compile(r"\]\((?!https?://|#|mailto:)([^)#\s]+)")
 
 HOME_PATH = re.compile(r"(/(?:Users|home)/[A-Za-z]|[A-Za-z]:\\Users\\)")
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]+")
-PUBLIC_EMAIL = re.compile(r"(@users\.noreply\.github\.com|^noreply@anthropic\.com|@example\.(com|org))$")
+PUBLIC_EMAIL = re.compile(
+    r"(@users\.noreply\.github\.com|^noreply@anthropic\.com|@example\.(com|org))$"
+)
 HISTORY_EMAIL = re.compile(r"(@users\.noreply\.github\.com|^noreply@github\.com)$")
 SECRET = re.compile(
     r"(gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|sk-[a-z]{2,4}-[A-Za-z0-9_-]{20,}"
@@ -46,7 +58,11 @@ def parse_terms(text):
 
 def parse_markdown_terms(text):
     body = re.sub(r"\A---\n.*?\n---\n", "", text, flags=re.DOTALL)
-    return [line[2:].strip() for line in body.splitlines() if line.startswith("- ") and line[2:].strip()]
+    return [
+        line[2:].strip()
+        for line in body.splitlines()
+        if line.startswith("- ") and line[2:].strip()
+    ]
 
 
 def load_terms(terms_file=None):
@@ -54,7 +70,9 @@ def load_terms(terms_file=None):
     path = Path(terms_file) if terms_file else DEFAULT_TERMS_FILE
     if path.is_file():
         text = path.read_text(encoding="utf-8")
-        terms += parse_markdown_terms(text) if path.suffix == ".md" else parse_terms(text)
+        terms += (
+            parse_markdown_terms(text) if path.suffix == ".md" else parse_terms(text)
+        )
     return terms
 
 
@@ -99,24 +117,42 @@ def check_hidden(root, files):
             if any(unicodedata.category(character) == "Cf" for character in line):
                 findings.append(f"{name}:{number}: an invisible character")
         if name.startswith("plugins/") and name.endswith(".md") and "<!--" in text:
-            findings.append(f"{name}: an HTML comment, which a reader of the page would not see")
+            findings.append(
+                f"{name}: an HTML comment, which a reader of the page would not see"
+            )
     return findings
 
 
 def check_powers(root):
     """Names each thing that lets a plugin act, unless reviewed-powers.json records its review."""
     reviewed_file = root / "reviewed-powers.json"
-    reviewed = json.loads(reviewed_file.read_text(encoding="utf-8")) if reviewed_file.is_file() else {}
+    reviewed = (
+        json.loads(reviewed_file.read_text(encoding="utf-8"))
+        if reviewed_file.is_file()
+        else {}
+    )
     powers = []
-    for plugin in sorted((root / "plugins").glob("*")) if (root / "plugins").is_dir() else []:
-        powers += [plugin / power for power in POWER_FOLDERS if (plugin / power).exists()]
+    for plugin in (
+        sorted((root / "plugins").glob("*")) if (root / "plugins").is_dir() else []
+    ):
+        powers += [
+            plugin / power for power in POWER_FOLDERS if (plugin / power).exists()
+        ]
         for skill in sorted((plugin / "skills").glob("*/SKILL.md")):
-            powers += [skill.parent / power for power in POWER_FOLDERS if (skill.parent / power).exists()]
+            powers += [
+                skill.parent / power
+                for power in POWER_FOLDERS
+                if (skill.parent / power).exists()
+            ]
             fields = frontmatter(skill.read_text(encoding="utf-8")) or {}
             if "allowed-tools" in fields or "hooks" in fields:
                 powers.append(skill)
     names = [path.relative_to(root).as_posix() for path in powers]
-    return [f"{name}: can act, and is not in reviewed-powers.json" for name in names if name not in reviewed]
+    return [
+        f"{name}: can act, and is not in reviewed-powers.json"
+        for name in names
+        if name not in reviewed
+    ]
 
 
 def frontmatter(text):
@@ -145,11 +181,17 @@ def check_skill(path):
         findings.append(f"{where}: name differs from its folder")
     description = fields.get("description", "")
     if not 1 <= len(description) <= MAX_DESCRIPTION:
-        findings.append(f"{where}: description missing or over {MAX_DESCRIPTION} characters")
+        findings.append(
+            f"{where}: description missing or over {MAX_DESCRIPTION} characters"
+        )
     if not 1 <= len(fields.get("compatibility", "")) <= MAX_COMPATIBILITY:
-        findings.append(f"{where}: compatibility missing or over {MAX_COMPATIBILITY} characters")
+        findings.append(
+            f"{where}: compatibility missing or over {MAX_COMPATIBILITY} characters"
+        )
     if MODEL_NAME.search(text):
-        findings.append(f"{where}: a vendor's model name, which belongs in references/models.md")
+        findings.append(
+            f"{where}: a vendor's model name, which belongs in references/models.md"
+        )
     if len(text.splitlines()) >= MAX_SKILL_LINES:
         findings.append(f"{where}: {MAX_SKILL_LINES} lines or more")
     for target in LINK.findall(text):
@@ -159,7 +201,9 @@ def check_skill(path):
 
 
 def check_format(root):
-    entries = json.loads((root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))["plugins"]
+    entries = json.loads(
+        (root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
+    )["plugins"]
     listed = {entry["name"]: entry["source"] for entry in entries}
     findings = []
     for name, source in listed.items():
@@ -167,13 +211,19 @@ def check_format(root):
             findings.append(f"marketplace: {name} has an unexpected source")
     readme = root / "README.md"
     readme_text = readme.read_text(encoding="utf-8") if readme.is_file() else ""
-    for plugin in sorted((root / "plugins").glob("*")) if (root / "plugins").is_dir() else []:
+    for plugin in (
+        sorted((root / "plugins").glob("*")) if (root / "plugins").is_dir() else []
+    ):
         if not plugin.is_dir():
             continue
         if plugin.name not in listed:
             findings.append(f"marketplace: {plugin.name} is not listed")
         manifest = plugin / ".claude-plugin" / "plugin.json"
-        if not manifest.is_file() or json.loads(manifest.read_text(encoding="utf-8")).get("name") != plugin.name:
+        if (
+            not manifest.is_file()
+            or json.loads(manifest.read_text(encoding="utf-8")).get("name")
+            != plugin.name
+        ):
             findings.append(f"{plugin.name}: plugin.json name differs from its folder")
         skills = sorted((plugin / "skills").glob("*/SKILL.md"))
         if not skills:
@@ -189,8 +239,17 @@ def check_history(root, terms=()):
     """Checks commit emails, author names and messages. A committer's name is not checked, because
     GitHub writes the merging account's display name there and no setting here can change that."""
     log = subprocess.run(
-        ["git", "-C", str(root), "log", "--all", "--format=%h%x00%ae%x00%ce%x00%an%x00%B%x01"],
-        capture_output=True, text=True, check=False,
+        [
+            "git",
+            "-C",
+            str(root),
+            "log",
+            "--all",
+            "--format=%h%x00%ae%x00%ce%x00%an%x00%B%x01",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
     )
     findings = []
     for record in log.stdout.split("\x01"):
@@ -207,16 +266,34 @@ def check_history(root, terms=()):
 
 def tracked_files(root):
     listing = subprocess.run(
-        ["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard"],
-        capture_output=True, text=True, check=True,
+        [
+            "git",
+            "-C",
+            str(root),
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
     )
     return listing.stdout.splitlines()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Check this repo for leaks and malformed skills.")
-    parser.add_argument("--history", action="store_true", help="check commit emails and messages too")
-    parser.add_argument("--require-terms", action="store_true", help="fail if no private word list was found")
+    parser = argparse.ArgumentParser(
+        description="Check this repo for leaks and malformed skills."
+    )
+    parser.add_argument(
+        "--history", action="store_true", help="check commit emails and messages too"
+    )
+    parser.add_argument(
+        "--require-terms",
+        action="store_true",
+        help="fail if no private word list was found",
+    )
     parser.add_argument("--terms-file", help="a private word list, one word a line")
     args = parser.parse_args()
 
@@ -226,7 +303,12 @@ def main():
         print("No private word list found.", file=sys.stderr)
         return 1
     files = tracked_files(root)
-    findings = check_leaks(root, files, terms) + check_hidden(root, files) + check_format(root) + check_powers(root)
+    findings = (
+        check_leaks(root, files, terms)
+        + check_hidden(root, files)
+        + check_format(root)
+        + check_powers(root)
+    )
     if args.history:
         findings += check_history(root, terms)
     for finding in findings:

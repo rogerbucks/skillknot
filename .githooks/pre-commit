@@ -1,0 +1,3 @@
+#!/bin/sh
+# Tidies what is about to be committed. Turn it on once per clone: git config core.hooksPath .githooks
+exec python3 "$(git rev-parse --show-toplevel)/scripts/tidy.py" --staged
