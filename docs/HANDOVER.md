@@ -43,9 +43,10 @@ its file list.
   rendered empty. The skill refreshes them on first use. Check them by hand when convenient:
   `GL-ISO42001`, `GL-UNGP`, `US-COAI`, `EU-NIS2`, `EU-GREEN`, `EU-CSRD`, `AU-E8`, `IN-DPDP`,
   `HK-PDPO`, `CA-QC25`
-- **Weekly freshness, two layers.** At run time, any standard in use that was checked more than 7
-  days ago is reopened and written to a local cache outside the repo. In the repo, the
-  `Standards links` workflow checks every link each Monday and only warns
+- **Weekly freshness, at run time.** Any standard in use that was checked more than 7 days ago is
+  reopened and written to a local cache outside the repo. A scheduled link checker was tried and
+  dropped by the owner: government sites block it, so about 38 of 157 links fail falsely. The
+  existing non-blocking `links` CI job shows the same noise on pull requests
 - **Lifecycle and industry sweep.** `references/lifecycle.md` maps ten company phases (formation
   to exit) and ten industries to the extra audiences, lenses, standards and experts each brings.
   Its last section lists registry gaps it found: employment, insolvency, competition and takeover,
