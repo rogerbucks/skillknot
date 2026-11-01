@@ -45,6 +45,7 @@ put that at the top of the report.
 The run-time rule above is the weekly check: any standard a review uses is reopened when its
 newest check is over 7 days old. There is no scheduled link checker, because many government
 sites refuse automated checkers (bot challenges, HTTP/2 resets, 503s, or a 404 for a page that
-opens in a browser), so it would raise mostly false alarms. A review that finds a moved link, a
+opens in a browser), so it would raise mostly false alarms. To check by hand, run `python3 scripts/links.py` on
+the standards files: it separates refusals from real 404s. A review that finds a moved link, a
 new version or a replacement lists it under *Registry updates*, so the user can update the row
 and its Checked date in a pull request.

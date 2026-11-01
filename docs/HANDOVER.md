@@ -10,8 +10,8 @@ throughout. This file holds the reasoning that the code cannot.
 - **`adversarial-review`:** a hostile expert panel attacks one or
   more items against audiences, styles, standards and obligations by region, phase and industry.
   The user confirms the panel first, and any lens they ask for always runs
-- **The gate:** pull requests only, rebase merges only, and `checks` and `lint` must pass. The
-  `links` job reports but does not block
+- **The gate:** pull requests only, rebase merges only, and `checks` and `lint` must pass.
+  Links are checked locally, not in CI: `python3 scripts/links.py`
 - **Automatic review and merge:** `review.yml` has an
   automated reviewer read each pull request against AGENTS.md, post one comment, and fail on a
   BLOCK verdict. `auto-merge.yml` turns on rebase auto-merge for the owner's own non-draft pull
@@ -53,7 +53,8 @@ its file list.
 - **Weekly freshness, at run time.** Any standard in use that was checked more than 7 days ago is
   reopened and written to a local cache outside the repo. A scheduled link checker was tried and
   dropped by the owner: government sites block it, so about 38 of 157 links fail falsely. The
-  existing non-blocking `links` CI job shows the same noise on pull requests
+  `links` CI job was removed for the same reason. `scripts/links.py` runs by hand and only fails
+  on a 404, 410 or missing host
 - **Lifecycle and industry sweep.** `references/lifecycle.md` maps ten company phases (formation
   to exit) and ten industries to the extra audiences, lenses, standards and experts each brings.
   Its last section lists registry gaps it found: employment, insolvency, competition and takeover,
