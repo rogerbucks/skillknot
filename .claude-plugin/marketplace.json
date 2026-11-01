@@ -5,5 +5,11 @@
     "name": "rogerbucks",
     "url": "https://github.com/rogerbucks"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "gauntlet",
+      "source": "./plugins/gauntlet",
+      "description": "Improve one existing item against a stated bar, inside a spending cap"
+    }
+  ]
 }
