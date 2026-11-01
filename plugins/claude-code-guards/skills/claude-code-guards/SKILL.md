@@ -65,8 +65,6 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 - **`allow_paths`:** exact paths the secret guard lets through. Use whole paths, not patterns
 - **`rebuildable`:** folder names a recursive delete may remove without a prompt, when it removes
   only those. Use them for folders a build makes again
-- **`tripwire_tools`:** extra tools whose results the tripwire reads, such as `"Read"` for
-  downloaded files. It reads web and connector tools already
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 
@@ -92,6 +90,8 @@ it on.
 
 - The guards read the plain spellings of a command. A program that pushes or reads a key by
   itself is not seen, and the sandbox and the person's review cover that
+- The tripwire reads only web search, web fetch and connector results. Files read from disk and
+  command output are not checked, because a hook on every read would slow each step down
 - `rebuildable` matches folder names, not paths. `rm -rf /any/where/node_modules` runs without a
   prompt, so list only names you would happily lose anywhere
 - The SQL check catches the common forms of `DROP`, `TRUNCATE` and a `DELETE` with no `WHERE`. An
