@@ -40,7 +40,7 @@ POWER_FOLDERS = (
 LINK = re.compile(r"\]\((?!https?://|#|mailto:)([^)#\s]+)")
 
 HOME_PATH = re.compile(r"(/(?:Users|home)/[A-Za-z]|[A-Za-z]:\\Users\\)")
-EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z0-9.-]+")
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 PUBLIC_EMAIL = re.compile(
     r"(@users\.noreply\.github\.com|^noreply@anthropic\.com|@example\.(com|org))$"
 )

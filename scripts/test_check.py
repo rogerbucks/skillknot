@@ -61,6 +61,9 @@ class LeakTests(unittest.TestCase):
     def test_noreply_email_passes(self):
         self.assertEqual(self.leaks("1+a@users.noreply.github.com\n"), [])
 
+    def test_pinned_package_version_passes(self):
+        self.assertEqual(self.leaks("npx some-tool@0.24.0 run\n"), [])
+
     def test_secret_shape_fails(self):
         self.assertTrue(self.leaks("key = " + "ghp_" + "a" * 36 + "\n"))
 
