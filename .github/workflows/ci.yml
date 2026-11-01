@@ -62,14 +62,3 @@ jobs:
             [ -d "$skill" ] || continue
             pipx run --spec skills-ref==0.1.1 agentskills validate "$skill"
           done
-
-  # Not required: a site being down says nothing about this repo, so a dead link warns and never blocks.
-  links:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
-      - run: docker run --rm -v "$PWD:/repo" -w /repo lycheeverse/lychee:0.24.2 --no-progress --accept 200,403,429 './**/*.md'
