@@ -15,6 +15,11 @@
       "name": "private-words",
       "source": "./plugins/private-words",
       "description": "Keep private words out of a repo, with the list held only where the user chooses"
+    },
+    {
+      "name": "adversarial-review",
+      "source": "./plugins/adversarial-review",
+      "description": "Hostile expert-panel review of one or more items against audiences, styles, standards and obligations, by region"
     }
   ]
 }

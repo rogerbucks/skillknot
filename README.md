@@ -12,6 +12,14 @@ so you can install only the ones you want.
   are in [references/sources.md](plugins/gauntlet/skills/gauntlet/references/sources.md).
   **Status: early.** The method has been piloted by hand, but the skill has not yet had a full run.
 
+- **`adversarial-review`:** a hostile expert panel attacks one or more items before they ship. It
+  profiles each item's audiences, language style, expectations, standards and legal obligations
+  by region and by company lifecycle phase and industry, proposes the experts with reasons for you
+  to confirm, always runs any lens you ask for, and cites every finding to a linked source. Default
+  registries cover global standards, the US, EU, UK, Australia and New Zealand, Asia Pacific and
+  Canada. Each source is a link with a cached note, rechecked when over a week old.
+  **Status: early.** Paper design only, no live run yet.
+
 - **`private-words`:** keep private words out of a repo. The list lives only where you choose,
   outside every repo, and a script scans files and history without ever showing a word.
 
