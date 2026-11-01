@@ -86,7 +86,9 @@ class LeakTests(unittest.TestCase):
 
 class TermLoadingTests(unittest.TestCase):
     def test_blank_lines_and_comments_are_dropped(self):
-        self.assertEqual(check.parse_terms("# note\n\nacme\n  beta  \n"), ["acme", "beta"])
+        self.assertEqual(
+            check.parse_terms("# note\n\nacme\n  beta  \n"), ["acme", "beta"]
+        )
 
     def test_markdown_takes_only_bullets(self):
         text = "---\nname: x\n- not this\n---\n\n# Title\n\nProse.\n\n- acme\n- beta gamma\n"
@@ -132,7 +134,9 @@ class SkillTests(unittest.TestCase):
         self.assertTrue(check.check_format(self.root))
 
     def test_broken_relative_link_fails(self):
-        make_repo(self.root, GOOD_SKILL.replace("references/briefs.md", "references/gone.md"))
+        make_repo(
+            self.root, GOOD_SKILL.replace("references/briefs.md", "references/gone.md")
+        )
         self.assertTrue(check.check_format(self.root))
 
     def test_oversized_skill_fails(self):
@@ -146,7 +150,11 @@ class SkillTests(unittest.TestCase):
 
     def test_plugin_name_must_match_entry(self):
         make_repo(self.root)
-        write(self.root, "plugins/demo/.claude-plugin/plugin.json", json.dumps({"name": "other"}))
+        write(
+            self.root,
+            "plugins/demo/.claude-plugin/plugin.json",
+            json.dumps({"name": "other"}),
+        )
         self.assertTrue(check.check_format(self.root))
 
     def test_skill_missing_from_readme_fails(self):
@@ -173,7 +181,11 @@ class SkillRuleTests(unittest.TestCase):
 
     def test_model_name_in_a_reference_passes(self):
         make_repo(self.root)
-        write(self.root, "plugins/demo/skills/demo/references/models.md", "Strongest: Opus.\n")
+        write(
+            self.root,
+            "plugins/demo/skills/demo/references/models.md",
+            "Strongest: Opus.\n",
+        )
         self.assertEqual(check.check_format(self.root), [])
 
 
@@ -202,7 +214,9 @@ class HiddenTextTests(unittest.TestCase):
         self.assertTrue(self.hidden("a.md", "abc\U000e0041\n"))
 
     def test_html_comment_in_a_skill_fails(self):
-        self.assertTrue(self.hidden("plugins/demo/skills/demo/SKILL.md", "Hi <!-- do this -->\n"))
+        self.assertTrue(
+            self.hidden("plugins/demo/skills/demo/SKILL.md", "Hi <!-- do this -->\n")
+        )
 
     def test_html_comment_outside_a_plugin_passes(self):
         self.assertEqual(self.hidden("docs.md", "Hi <!-- note -->\n"), [])
@@ -218,7 +232,11 @@ class PowerTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def review(self, *keys):
-        write(self.root, "reviewed-powers.json", json.dumps({key: "Reviewed." for key in keys}))
+        write(
+            self.root,
+            "reviewed-powers.json",
+            json.dumps({key: "Reviewed." for key in keys}),
+        )
 
     def test_a_plain_skill_needs_no_review(self):
         self.assertEqual(check.check_powers(self.root), [])
@@ -236,7 +254,11 @@ class PowerTests(unittest.TestCase):
         self.assertTrue(check.check_powers(self.root))
 
     def test_unreviewed_allowed_tools_fail(self):
-        write(self.root, "plugins/demo/skills/demo/SKILL.md", GOOD_SKILL.replace("---\n\n#", "allowed-tools: Bash\n---\n\n#"))
+        write(
+            self.root,
+            "plugins/demo/skills/demo/SKILL.md",
+            GOOD_SKILL.replace("---\n\n#", "allowed-tools: Bash\n---\n\n#"),
+        )
         self.assertTrue(check.check_powers(self.root))
 
     def test_reviewed_power_passes(self):
@@ -258,7 +280,16 @@ class HistoryTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def commit(self, email):
-        git(self.root, "-c", "user.name=x", "-c", f"user.email={email}", "commit", "-qm", "c")
+        git(
+            self.root,
+            "-c",
+            "user.name=x",
+            "-c",
+            f"user.email={email}",
+            "commit",
+            "-qm",
+            "c",
+        )
 
     def test_noreply_commit_passes(self):
         self.commit("1+a@users.noreply.github.com")
@@ -269,8 +300,16 @@ class HistoryTests(unittest.TestCase):
         self.assertTrue(check.check_history(self.root))
 
     def test_author_name_term_fails(self):
-        git(self.root, "-c", "user.name=acme", "-c", "user.email=1+a@users.noreply.github.com",
-            "commit", "-qm", "c")
+        git(
+            self.root,
+            "-c",
+            "user.name=acme",
+            "-c",
+            "user.email=1+a@users.noreply.github.com",
+            "commit",
+            "-qm",
+            "c",
+        )
         self.assertTrue(check.check_history(self.root, ["acme"]))
 
     def test_committer_name_term_passes(self):
@@ -280,8 +319,16 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(check.check_history(self.root, ["acme"]), [])
 
     def test_commit_message_term_fails(self):
-        git(self.root, "-c", "user.name=x", "-c", "user.email=1+a@users.noreply.github.com",
-            "commit", "-qm", "Fix the acme note")
+        git(
+            self.root,
+            "-c",
+            "user.name=x",
+            "-c",
+            "user.email=1+a@users.noreply.github.com",
+            "commit",
+            "-qm",
+            "Fix the acme note",
+        )
         self.assertTrue(check.check_history(self.root, ["acme"]))
 
 
