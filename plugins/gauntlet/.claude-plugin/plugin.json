@@ -1,0 +1,6 @@
+{
+  "name": "gauntlet",
+  "description": "Improve one existing item against a stated bar, inside a spending cap",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}
