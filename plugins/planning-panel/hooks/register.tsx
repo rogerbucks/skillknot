@@ -139,7 +139,7 @@ export const register: Register = on => {
     const after = await update($, plan, before => applyChange(before, e as Change))
     void $.ui.open({ id: PANE, title: TITLE })
 
-    return { result: { text: `Panel updated.\n${asMarkdown(after)}` } }
+    return { result: `Panel updated.\n${asMarkdown(after)}` }
   }).catch(() => ({ deny: 'The planning panel could not update. Carry on in the chat.' }))
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
