@@ -5,41 +5,57 @@ throughout. This file holds the reasoning that the code cannot.
 
 ## What is live on `main`
 
-- **`gauntlet`:** repeated builder and critic rounds against a bar, with blind comparison
-- **`private-words`:** keeps private words out of a repo, with a list held outside every repo
-- **`adversarial-review`:** a hostile expert panel attacks one or
-  more items against audiences, styles, standards and obligations by region, phase and industry.
-  The user confirms the panel first, and any lens they ask for always runs
-- **The gate:** pull requests only, rebase merges only, and `checks` and `lint` must pass.
-  Links are checked locally, not in CI: `python3 scripts/links.py`
-- **Automatic review and merge:** `review.yml` has an
-  automated reviewer read each pull request against AGENTS.md, post one comment, and fail on a
-  BLOCK verdict. `auto-merge.yml` turns on rebase auto-merge for the owner's own non-draft pull
-  requests, so GitHub merges once every required check passes. It needs three owner settings:
-  an `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` secret, "Allow auto-merge", and `review`
-  added to the `main: CI must pass` ruleset. A merge made by the workflow token does not start
-  the `push` run of CI on `main`, so `main` is checked only through its pull requests
-- **Clean installs work:** `gauntlet` and `private-words` were installed from GitHub into an empty configuration
+**20 plugins, one skill each.** The README lists them all. In groups:
+
+- **Improve and review:** `gauntlet` (builder and critic rounds against a bar), `adversarial-review`
+  (a hostile expert panel by region, phase and industry), `private-words` (keeps private words out
+  of a repo)
+- **Sessions and documents:** `handoff`, `polish-document`, `document-bundle`, `verdict-first`
+- **Presentation and design:** `slide-storyline` (one headline claim per slide), `chart-picker`
+  (the chart from the reader's question, honest and colour-blind safe), `design-brief` (a one-page
+  brief agreed before building)
+- **Research and risk:** `ownership-map`, `read-only-researcher`, `taxonomy-review`,
+  `threat-model` (what could go wrong, cheapest fixes first, report only)
+- **Running an agent setup:** `capability-ladder`, `context-budget`, `model-picker` (the cheapest
+  model tier that does each step well)
+- **Claude Code hooks:** `claude-code-guards` asks before pushes, destructive commands and
+  connector sends, refuses secret paths, and warns when a web or connector result tries to give the
+  agent orders. `claude-code-session-meter` adds a status line, a cost, time and prompt cap, and a
+  handoff reminder
+- **One app:** `obsidian-canvas`
+- **The gate:** pull requests only, rebase merges only, and `checks`, `lint` and `review` must
+  pass. Links are checked locally, not in CI: `python3 scripts/links.py`
+- **Automatic review and merge:** `review.yml` has an automated reviewer read each pull request
+  against AGENTS.md, post one comment, and fail on a BLOCK verdict. `auto-merge.yml` turns on
+  rebase auto-merge for the owner's own non-draft pull requests. A merge made by the workflow token
+  does not start the `push` run of CI on `main`, so `main` is checked only through its pull
+  requests. A pull request that changes `review.yml` cannot pass `review`, so the owner merges it
+  by hand
 
 ## Do this first
 
-**Bring [pull request 8](https://github.com/rogerbucks/skillknot/pull/8) up to date.** It adds
-eleven plugins, and it is a draft that cannot merge yet.
+**Give the newest items a live run.** Everything added on 1 Nov 2026 passed its tests and an
+automated review, but none has run in a real session yet.
 
-1. **Resolve the conflicts.** `private-words` changed `marketplace.json`, `README.md` and
-   `reviewed-powers.json`, which that branch changes too
-2. **Keep both sides of `reviewed-powers.json`.** It is a list of reviewed powers, so no entry may
-   be dropped to settle a conflict
-3. **Get CI running.** The pull request shows no checks at all, so nothing there has passed the
-   gate yet. Its test count of 51 also predates the 84 now on `main`
-4. **Split it if review stalls.** Hooks that can stop or allow an agent's actions deserve their own
-   review, so `claude-code-guards` is the natural piece to take apart first
-5. **Run the stranger dry-run on each skill.** That pull request says each had a paper dry-run and
-   no live one. Paper runs earn their keep: the one for `private-words` found a word leaking
-   through a printed file name, and a failed history scan that reported clean
+1. **Install the two hook plugins** in a scratch project and try each guard: `git push`,
+   `git reset --hard`, reading `~/.ssh/config`, and a web page that quotes "ignore previous
+   instructions". Each should ask, refuse or warn as its skill says
+2. **Set up the status line** by hand, as the `claude-code-session-meter` skill describes. A
+   plugin cannot set it. Check that the cost and context figures match Claude Code's own
+3. **Run each new skill as a stranger:** `slide-storyline`, `chart-picker`, `design-brief`,
+   `threat-model` and `model-picker`. Paper runs earn their keep: the one for `private-words`
+   found a word leaking through a printed file name
+4. **Known small gaps,** left on purpose: the tripwire can flag an ordinary line that starts with
+   "System:", and the handoff reminder treats any skill call that mentions "handoff" as a handoff
 
-Pull request 8 was not reviewed for this handover. Everything above comes from its description and
-its file list.
+## How to ship a change here
+
+- **One branch per pull request, made from `main`.** Reusing a merged branch needs a force push,
+  which the agent's safety check refuses. A fresh branch name avoids that
+- **Keep hooks apart from skills.** Hooks can stop or steer an agent, so they get their own pull
+  request and their own review
+- **Open as a draft, then mark it ready once checks pass.** Marking ready starts a second review.
+  The reviewer's nits are optional; carry the good ones into the next pull request
 
 ## `adversarial-review`: what to know
 
@@ -78,6 +94,10 @@ its file list.
   the display name and would fail the check
 
 ## What to build next
+
+**A context advisor is being built next:** it reads a session's record and says which big files
+were read whole when a section would do, what was read twice, when to compact or start fresh, and
+when a cheaper model or a subagent would do.
 
 A script should take every step that needs no judgement. These five `gauntlet` scripts are
 proposals, and none has been built or run. Savings would be estimates, drawn from one pilot.
