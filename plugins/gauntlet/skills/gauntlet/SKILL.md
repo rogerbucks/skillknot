@@ -2,13 +2,14 @@
 name: gauntlet
 description: Use when the user names an existing item to improve against a bar with a Gauntlet Loop or Gauntlet Run, types /gauntlet with an item, or asks for repeated builder and critic rounds, a blind A/B against a reference, or a capped multi-agent quality pass on a page, script, report or document.
 license: MIT
-compatibility: Needs an agent harness with subagents, such as Claude Code. Model names are Claude tiers, so map them to your own.
+compatibility: Needs an agent harness with subagents, such as Claude Code. Works best with three model tiers.
 ---
 
 # gauntlet: improve one named item against a bar, inside a cap
 
 **The item is whatever the user names.** This file supplies the stages, the models and the stop
-rules. Agent briefs are in [references/briefs.md](references/briefs.md): read it at Stage 2. The
+rules. Agent briefs are in [references/briefs.md](references/briefs.md): read it at Stage 2. Each
+vendor's models are in [references/models.md](references/models.md): read it at Stage 1. The
 evidence behind the design is in [references/sources.md](references/sources.md).
 
 **Before Stage 0, read the project's own rules, then the personal overlay at
@@ -78,11 +79,14 @@ judge scores.
 
 ### Models
 
-- **Haiku:** fixed, fully specified edits, one pass, outside the loop. Never a critic or judge
-- **Sonnet:** builders and round critics
-- **Opus:** blind judges and the final critic. If asked for Opus builders, plan Sonnet and say at
-  the gate that one pilot found over three times Sonnet's cost for the same result. Opus builds
-  only if the user repeats the ask
+This skill names three tiers. Use the fast tier for what needs no judgement, and spend the
+strongest on judging.
+
+- **Fast tier:** fixed, fully specified edits, one pass, outside the loop. Never a critic or judge
+- **Mid tier:** builders and round critics
+- **Strongest tier:** blind judges and the final critic. If asked for strongest-tier builders,
+  plan the mid tier and say at the gate that one pilot found over three times the mid tier's cost
+  for the same result. The strongest tier builds only if the user repeats the ask
 - **Lead session:** budget about a third of the cap
 - **Local models:** builders at most, never critics or judges
 
@@ -96,12 +100,12 @@ judge scores.
 - **Per piece:** at most 3 rounds, and stop after 2 with no win
 - **Plan usage:** if the harness shows usage limits, check before each round and start no new
   round past 70% of the current window
-- **Agents:** coupled pieces one at a time, otherwise at most 4 alive, at most 1 on Opus
+- **Agents:** coupled pieces one at a time, otherwise at most 4 alive, at most 1 on the strongest tier
 
 ## Stages 2 to 4: Fixed items, first version, scripts
 
-- **2 Fixed items:** one Haiku pass
-- **3 First version:** one Sonnet pass per piece, no critic, in dependency order
+- **2 Fixed items:** one fast-tier pass
+- **3 First version:** one mid-tier pass per piece, no critic, in dependency order
 - **4 Scripts:** run the machine bar after each piece. Failures go back to the same builder, at
   most twice. Read the checker's result yourself. A checker can be wrong, so count a sample by
   hand once
@@ -113,9 +117,9 @@ use a real browser at true widths and in both colour modes.
 
 Each round:
 
-1. **Critic:** a new Sonnet agent, given the bar and real captures, never the builder's reasoning
+1. **Critic:** a new mid-tier agent, given the bar and real captures, never the builder's reasoning
 2. **Blind pair:** you make an unlabelled pair of the best version and this round's (see the
-   briefs), and a new Opus agent gives the verdict without knowing which is which
+   briefs), and a new strongest-tier agent gives the verdict without knowing which is which
 3. **Ratchet:** keep the round only if it beats the best so far. Otherwise restore the best
 4. **Next round:** the same builder fixes the judge's named faults, on the kept version
 
@@ -123,7 +127,7 @@ Each round:
 
 ## Stage 6: Final critic
 
-A new Opus agent reads the whole item at every width, mode and state, with the bar. Fix its
+A new strongest-tier agent reads the whole item at every width, mode and state, with the bar. Fix its
 blockers, rerun the machine bar, and say which fixes had no blind judgement. If the verdict is
 *Hold* (not *Ship*), the item stays out, and that is a result.
 
