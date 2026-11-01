@@ -186,14 +186,16 @@ def check_format(root):
 
 
 def check_history(root, terms=()):
+    """Checks commit emails, author names and messages. A committer's name is not checked, because
+    GitHub writes the merging account's display name there and no setting here can change that."""
     log = subprocess.run(
-        ["git", "-C", str(root), "log", "--all", "--format=%h%x00%ae%x00%ce%x00%an%x00%cn%x00%B%x01"],
+        ["git", "-C", str(root), "log", "--all", "--format=%h%x00%ae%x00%ce%x00%an%x00%B%x01"],
         capture_output=True, text=True, check=False,
     )
     findings = []
     for record in log.stdout.split("\x01"):
         parts = record.strip().split("\x00")
-        if len(parts) < 6:
+        if len(parts) < 5:
             continue
         commit, author, committer, *rest = parts
         if not (HISTORY_EMAIL.search(author) and HISTORY_EMAIL.search(committer)):

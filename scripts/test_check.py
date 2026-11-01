@@ -1,6 +1,7 @@
 """Tests for check.py. Run from the repo root: python3 -m unittest discover -s scripts"""
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -266,6 +267,17 @@ class HistoryTests(unittest.TestCase):
     def test_personal_commit_email_fails(self):
         self.commit("someone@example.org")
         self.assertTrue(check.check_history(self.root))
+
+    def test_author_name_term_fails(self):
+        git(self.root, "-c", "user.name=acme", "-c", "user.email=1+a@users.noreply.github.com",
+            "commit", "-qm", "c")
+        self.assertTrue(check.check_history(self.root, ["acme"]))
+
+    def test_committer_name_term_passes(self):
+        # GitHub writes the merging account's display name here, and the owner has accepted that.
+        with mock.patch.dict(os.environ, {"GIT_COMMITTER_NAME": "acme"}):
+            self.commit("1+a@users.noreply.github.com")
+        self.assertEqual(check.check_history(self.root, ["acme"]), [])
 
     def test_commit_message_term_fails(self):
         git(self.root, "-c", "user.name=x", "-c", "user.email=1+a@users.noreply.github.com",
