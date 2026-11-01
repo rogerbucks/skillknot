@@ -7,19 +7,19 @@ throughout. This file holds the reasoning that the code cannot.
 
 - **`gauntlet`:** repeated builder and critic rounds against a bar, with blind comparison
 - **`private-words`:** keeps private words out of a repo, with a list held outside every repo
-- **`adversarial-review` (in review, not yet on `main`):** a hostile expert panel attacks one or
+- **`adversarial-review`:** a hostile expert panel attacks one or
   more items against audiences, styles, standards and obligations by region, phase and industry.
   The user confirms the panel first, and any lens they ask for always runs
 - **The gate:** pull requests only, rebase merges only, and `checks` and `lint` must pass. The
   `links` job reports but does not block
-- **Automatic review and merge (added with the adversarial-review PR):** `review.yml` has an
+- **Automatic review and merge:** `review.yml` has an
   automated reviewer read each pull request against AGENTS.md, post one comment, and fail on a
   BLOCK verdict. `auto-merge.yml` turns on rebase auto-merge for the owner's own non-draft pull
   requests, so GitHub merges once every required check passes. It needs three owner settings:
   an `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` secret, "Allow auto-merge", and `review`
   added to the `main: CI must pass` ruleset. A merge made by the workflow token does not start
   the `push` run of CI on `main`, so `main` is checked only through its pull requests
-- **Clean installs work:** both skills were installed from GitHub into an empty configuration
+- **Clean installs work:** `gauntlet` and `private-words` were installed from GitHub into an empty configuration
 
 ## Do this first
 
