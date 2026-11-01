@@ -49,8 +49,10 @@ so you can install only the ones you want.
   fix, and propose before installing anything
 - **`context-budget`:** measure always-loaded context and hook latency against budgets, and fix a
   breach by moving material, not deleting it
-- **`claude-code-guards`:** Claude Code hooks that ask before pushes and connector sends, and keep
+- **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and connector sends, and keep
   secrets out of reach, plus a hardened `settings.json` template. **Claude Code only**
+- **`claude-code-session-meter`:** a status line showing branch, unpushed work, context, cost and
+  time, plus a cap that warns when a session runs long or costly. **Claude Code only**
 
 ### Tools for one app
 

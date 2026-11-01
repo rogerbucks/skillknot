@@ -19,7 +19,12 @@
     {
       "name": "claude-code-guards",
       "source": "./plugins/claude-code-guards",
-      "description": "Claude Code hooks that ask before pushes and connector sends, keep secrets out of reach, plus a hardened settings template"
+      "description": "Claude Code hooks that ask before pushes, destructive commands and connector sends, keep secrets out of reach, plus a hardened settings template"
+    },
+    {
+      "name": "claude-code-session-meter",
+      "source": "./plugins/claude-code-session-meter",
+      "description": "A Claude Code status line for branch, unpushed work, context, cost and time, plus a cap that warns when a session runs long or costly"
     },
     {
       "name": "context-budget",

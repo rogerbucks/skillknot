@@ -17,6 +17,7 @@ GUARDS = (
 sys.path.insert(0, str(GUARDS))
 
 import connector_guard
+import destructive_guard
 import outward_confirm
 import secret_guard
 
@@ -201,6 +202,58 @@ class Secret(unittest.TestCase):
             )
         )
         self.assertIsNone(hook("secret_guard.py", read, {"off": ["secret"]}))
+
+
+class Destructive(unittest.TestCase):
+    def test_finds_risks(self):
+        find = lambda c, r=(): destructive_guard.risks(c, "/work", r)
+        for bad in (
+            "rm -rf build",
+            "rm -r -f ~/notes",
+            "sudo rm --recursive /var/data",
+            "cd x && rm -Rf .",
+            "git reset --hard HEAD~1",
+            "git -C /repo reset --hard",
+            "git clean -fdx",
+            "git checkout -- .",
+            "git restore .",
+            "git branch -D feature",
+            "git stash drop",
+            "find . -name '*.log' -delete",
+            "dd if=/dev/zero of=/dev/sda",
+            "terraform destroy -auto-approve",
+            "kubectl delete pod web",
+            "docker system prune -a",
+            'psql -c "DROP TABLE users;"',
+            "sqlite3 app.db 'truncate table logs'",
+            'mysql -e "DELETE FROM orders;"',
+        ):
+            self.assertTrue(find(bad), bad)
+        for good in (
+            "rm notes.txt",
+            "rm -f a.log",
+            "ls -rf",
+            "git reset HEAD a.txt",
+            "git restore --staged .",
+            "git checkout main",
+            "git branch -d merged",
+            "git stash list",
+            "git clean -n",
+            "echo rm -rf /",
+            'psql -c "DELETE FROM orders WHERE id = 3"',
+            "kubectl get pods",
+        ):
+            self.assertFalse(find(good), good)
+        self.assertFalse(find("rm -rf node_modules dist/", ("node_modules", "dist")))
+        self.assertTrue(find("rm -rf node_modules src", ("node_modules",)))
+
+    def test_hook(self):
+        bash = lambda c: {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": "/"}
+        self.assertEqual(hook("destructive_guard.py", bash("git reset --hard")), "ask")
+        self.assertIsNone(hook("destructive_guard.py", bash("git status")))
+        self.assertIsNone(
+            hook("destructive_guard.py", bash("rm -rf /x"), {"off": ["destructive"]})
+        )
 
 
 class Connector(unittest.TestCase):

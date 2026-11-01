@@ -14,6 +14,9 @@ setup. No code was copied. The links were read on 1 Nov 2026.
 
 - **Ask, rather than refuse, wherever a person can judge.** A push is the person's call. The
   guard's job is to show them what they are approving
+- **Ask before destroying work, rather than refuse.** Deleting a build folder or resetting a
+  branch is often right. The deny rule in the settings template catches only one spelling of
+  `rm -rf`, so the hook reads the command's real options instead
 - **Refuse secret paths outright,** because reading a key cannot be undone
 - **A failing guard asks.** A crash must never wave a call through unseen
 - **Findings never print a secret.** They name the rule that matched
