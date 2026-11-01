@@ -48,7 +48,9 @@ test('the tool fills the panel, and a later call replaces only what it sends', a
     open_questions: ['Which date?'],
     next_steps: ['Shortlist three venues'],
   })
-  await $.tool.call({ tool: TOOL, open_questions: [] })
+  const ran = await $.tool.call({ tool: TOOL, open_questions: [] })
+  // A tool's result reaches the model as text: an object is refused in a session.
+  expect(typeof ran.result).toBe('string')
 
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ ...PANE, surface })
