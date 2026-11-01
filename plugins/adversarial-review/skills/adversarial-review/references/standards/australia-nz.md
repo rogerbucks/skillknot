@@ -9,7 +9,7 @@ end. How to read and refresh this table is in [../cache.md](../cache.md).
 | --- | --- | --- | --- | --- | --- |
 | `AU-PRIV` | [Australian Privacy Principles (OAIC)](https://www.oaic.gov.au/privacy/australian-privacy-principles) | Law | Personal information, most businesses over $3m turnover and all health providers | Privacy Act 1988, Schedule 1. Being amended in tranches: check for changes | 1 Nov 2026 |
 | `AU-NDB` | [Notifiable Data Breaches scheme](https://www.oaic.gov.au/privacy/notifiable-data-breaches) | Law | Breach notices, incident plans | OAIC guidance page | 1 Nov 2026 |
-| `AU-ACL` | [Australian Consumer Law](https://consumer.gov.au/australian-consumer-law) | Law | Any consumer claim, contract or guarantee | Unfair contract terms, guarantees, product safety, unsolicited sales | 1 Nov 2026 |
+| `AU-ACL` | [Australian Consumer Law](https://consumerlaw.gov.au/about/australian-consumer-law) | Law | Any consumer claim, contract or guarantee | Unfair contract terms, guarantees, product safety, unsolicited sales. Old consumer.gov.au link has a broken certificate | 1 Nov 2026 |
 | `AU-SPAM` | [ACMA spam rules](https://www.acma.gov.au/spam) | Law | Commercial email and text | Spam Act 2003. This page is ACMA's spam hub | 1 Nov 2026 |
 | `AU-DDA` | [Disability Discrimination Act 1992](https://www.legislation.gov.au/C2004A04426/latest/text) | Law | Services, sites, employment | Compilation Oct 2026. WCAG is the usual technical bar | 1 Nov 2026 |
 | `AU-CORP` | [Corporations Act 2001](https://www.legislation.gov.au/C2004A00818/latest/text) | Law | Directors, disclosure, financial services, insolvency | Compilation 19 Sep 2026 | 1 Nov 2026 |
