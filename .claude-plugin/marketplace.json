@@ -77,6 +77,11 @@
       "description": "Trace who ultimately controls a company, what else they hold, and where interests align"
     },
     {
+      "name": "planning-panel",
+      "source": "./plugins/planning-panel",
+      "description": "A Claude Code pane beside the chat that keeps the plan current as you talk: goal, audience, limits, open questions and next steps. Needs Claude Code early access (mods)"
+    },
+    {
       "name": "polish-document",
       "source": "./plugins/polish-document",
       "description": "Turn a rough capture into a professional document: gaps first, then review, format and diagrams"

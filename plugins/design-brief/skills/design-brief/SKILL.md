@@ -74,6 +74,9 @@ not ask again for small changes. Note them in the brief and carry on.
 ## 5. Build against the brief, and check against it
 
 - **Keep the brief beside the work** and re-read the job line when choosing between options
+- **If a planning panel is available** (the `planning-panel` skill or its pane), fill it as the
+  brief takes shape: Job as the goal, For as the audience, Must and Won't as limits, gaps as open
+  questions
 - **When a new idea appears mid-build,** check it against "won't". If it does not fit, note it as
   a later idea instead of adding it
 - **At the end, run the test of done** or say plainly that it has not been run yet, and how to
