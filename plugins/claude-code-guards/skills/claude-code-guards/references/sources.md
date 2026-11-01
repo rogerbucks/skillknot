@@ -20,5 +20,8 @@ setup. No code was copied. The links were read on 1 Nov 2026.
 - **Refuse secret paths outright,** because reading a key cannot be undone
 - **A failing guard asks.** A crash must never wave a call through unseen
 - **Findings never print a secret.** They name the rule that matched
+- **The tripwire warns and never blocks,** because a page that quotes an attack, such as a
+  security article, is often what the person wanted. It names the kind of text, never repeats
+  it, so the warning cannot carry the attack itself
 - **The connector rule targets prompt injection.** Read content can carry instructions, so text
   read from messages should not leave without a person seeing the call

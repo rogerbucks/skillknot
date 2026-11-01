@@ -1,5 +1,5 @@
 {
-  "description": "Outward, destructive, secret and connector guards. Each asks or refuses; none edits anything.",
+  "description": "Outward, destructive, secret and connector guards ask or refuse before a call; none edits anything. The injection tripwire only adds a warning after a web or connector result.",
   "hooks": {
     "PreToolUse": [
       {
@@ -28,6 +28,18 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/connector_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/injection_tripwire.py\"",
             "timeout": 10
           }
         ]
