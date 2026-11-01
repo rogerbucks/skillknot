@@ -1,0 +1,3 @@
+#!/bin/sh
+# Stops a push that would fail CI. Turn it on once per clone: git config core.hooksPath .githooks
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check.py" --history --require-terms

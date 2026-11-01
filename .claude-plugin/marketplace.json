@@ -1,0 +1,9 @@
+{
+  "name": "skillknot",
+  "description": "Reusable skills for AI coding agents",
+  "owner": {
+    "name": "rogerbucks",
+    "url": "https://github.com/rogerbucks"
+  },
+  "plugins": []
+}
