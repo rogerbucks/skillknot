@@ -1,0 +1,8 @@
+{
+  "name": "claude-code-context-advisor",
+  "description": "Read a Claude Code session's record and advise on context: big files read whole, repeat reads, heavy output, when to compact or start fresh, and when a subagent or cheaper model would do",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}
