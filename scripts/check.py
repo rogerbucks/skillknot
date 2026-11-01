@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Checks this repo before anything reaches main: no personal details, and every skill well formed.
+"""Checks this repo before anything reaches main: no personal details, no hidden text, every skill
+well formed, and anything that lets a plugin act named in reviewed-powers.json.
 
 Usage: python3 scripts/check.py [--history] [--require-terms] [--terms-file PATH]
 Writes: nothing (read-only)
@@ -15,13 +16,17 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 
 ALLOWED_WORDS = ("rogerbucks",)  # the public GitHub handle, which the repo URL shows anyway
 DEFAULT_TERMS_FILE = Path.home() / ".config" / "skillknot" / "blocked-terms.md"
 MAX_SKILL_LINES = 500
 MAX_DESCRIPTION = 1024
+MAX_COMPATIBILITY = 500
 NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+MODEL_NAME = re.compile(r"\b(haiku|sonnet|opus|gemini|gpt-?\d[\w.-]*)\b", re.IGNORECASE)
+POWER_FOLDERS = ("hooks", "scripts", "agents", "commands", "bin", ".mcp.json", ".lsp.json")
 LINK = re.compile(r"\]\((?!https?://|#|mailto:)([^)#\s]+)")
 
 HOME_PATH = re.compile(r"(/(?:Users|home)/[A-Za-z]|[A-Za-z]:\\Users\\)")
@@ -40,7 +45,7 @@ def parse_terms(text):
 
 
 def parse_markdown_terms(text):
-    body = re.sub(r"\A---\n.*?\n---\n", "", text, flags=re.S)
+    body = re.sub(r"\A---\n.*?\n---\n", "", text, flags=re.DOTALL)
     return [line[2:].strip() for line in body.splitlines() if line.startswith("- ") and line[2:].strip()]
 
 
@@ -82,8 +87,40 @@ def check_leaks(root, files, terms):
     return findings
 
 
+def check_hidden(root, files):
+    """Finds text a reader would not see, which could carry instructions past a review."""
+    findings = []
+    for name in files:
+        try:
+            text = (root / name).read_text(encoding="utf-8")
+        except (UnicodeDecodeError, FileNotFoundError):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            if any(unicodedata.category(character) == "Cf" for character in line):
+                findings.append(f"{name}:{number}: an invisible character")
+        if name.startswith("plugins/") and name.endswith(".md") and "<!--" in text:
+            findings.append(f"{name}: an HTML comment, which a reader of the page would not see")
+    return findings
+
+
+def check_powers(root):
+    """Names each thing that lets a plugin act, unless reviewed-powers.json records its review."""
+    reviewed_file = root / "reviewed-powers.json"
+    reviewed = json.loads(reviewed_file.read_text(encoding="utf-8")) if reviewed_file.is_file() else {}
+    powers = []
+    for plugin in sorted((root / "plugins").glob("*")) if (root / "plugins").is_dir() else []:
+        powers += [plugin / power for power in POWER_FOLDERS if (plugin / power).exists()]
+        for skill in sorted((plugin / "skills").glob("*/SKILL.md")):
+            powers += [skill.parent / power for power in POWER_FOLDERS if (skill.parent / power).exists()]
+            fields = frontmatter(skill.read_text(encoding="utf-8")) or {}
+            if "allowed-tools" in fields or "hooks" in fields:
+                powers.append(skill)
+    names = [path.relative_to(root).as_posix() for path in powers]
+    return [f"{name}: can act, and is not in reviewed-powers.json" for name in names if name not in reviewed]
+
+
 def frontmatter(text):
-    match = re.match(r"---\n(.*?)\n---\n", text, re.S)
+    match = re.match(r"---\n(.*?)\n---\n", text, re.DOTALL)
     if not match:
         return None
     fields = {}
@@ -109,6 +146,10 @@ def check_skill(path):
     description = fields.get("description", "")
     if not 1 <= len(description) <= MAX_DESCRIPTION:
         findings.append(f"{where}: description missing or over {MAX_DESCRIPTION} characters")
+    if not 1 <= len(fields.get("compatibility", "")) <= MAX_COMPATIBILITY:
+        findings.append(f"{where}: compatibility missing or over {MAX_COMPATIBILITY} characters")
+    if MODEL_NAME.search(text):
+        findings.append(f"{where}: a vendor's model name, which belongs in references/models.md")
     if len(text.splitlines()) >= MAX_SKILL_LINES:
         findings.append(f"{where}: {MAX_SKILL_LINES} lines or more")
     for target in LINK.findall(text):
@@ -182,7 +223,8 @@ def main():
     if args.require_terms and not terms:
         print("No private word list found.", file=sys.stderr)
         return 1
-    findings = check_leaks(root, tracked_files(root), terms) + check_format(root)
+    files = tracked_files(root)
+    findings = check_leaks(root, files, terms) + check_hidden(root, files) + check_format(root) + check_powers(root)
     if args.history:
         findings += check_history(root, terms)
     for finding in findings:

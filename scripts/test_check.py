@@ -9,9 +9,9 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).parent))
-import check  # noqa: E402
+import check
 
-GOOD_SKILL = "---\nname: demo\ndescription: Use when testing.\n---\n\n# demo\n\nSee [briefs](references/briefs.md).\n"
+GOOD_SKILL = "---\nname: demo\ndescription: Use when testing.\ncompatibility: Any agent.\n---\n\n# demo\n\nSee [briefs](references/briefs.md).\n"
 
 
 def write(root, relative, text):
@@ -152,6 +152,96 @@ class SkillTests(unittest.TestCase):
         make_repo(self.root)
         write(self.root, "README.md", "# Skills\n")
         self.assertTrue(check.check_format(self.root))
+
+
+class SkillRuleTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_missing_compatibility_fails(self):
+        make_repo(self.root, GOOD_SKILL.replace("compatibility: Any agent.\n", ""))
+        self.assertTrue(check.check_format(self.root))
+
+    def test_model_name_in_skill_fails(self):
+        make_repo(self.root, GOOD_SKILL + "Use Opus for this.\n")
+        self.assertTrue(check.check_format(self.root))
+
+    def test_model_name_in_a_reference_passes(self):
+        make_repo(self.root)
+        write(self.root, "plugins/demo/skills/demo/references/models.md", "Strongest: Opus.\n")
+        self.assertEqual(check.check_format(self.root), [])
+
+
+class HiddenTextTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def hidden(self, relative, text):
+        write(self.root, relative, text)
+        return check.check_hidden(self.root, [relative])
+
+    def test_plain_text_passes(self):
+        self.assertEqual(self.hidden("a.md", "Plain text, with an é and a £.\n"), [])
+
+    def test_zero_width_character_fails(self):
+        self.assertTrue(self.hidden("a.md", "Pl\u200bain\n"))
+
+    def test_text_direction_override_fails(self):
+        self.assertTrue(self.hidden("a.md", "abc\u202edef\n"))
+
+    def test_tag_character_fails(self):
+        self.assertTrue(self.hidden("a.md", "abc\U000e0041\n"))
+
+    def test_html_comment_in_a_skill_fails(self):
+        self.assertTrue(self.hidden("plugins/demo/skills/demo/SKILL.md", "Hi <!-- do this -->\n"))
+
+    def test_html_comment_outside_a_plugin_passes(self):
+        self.assertEqual(self.hidden("docs.md", "Hi <!-- note -->\n"), [])
+
+
+class PowerTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        make_repo(self.root)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def review(self, *keys):
+        write(self.root, "reviewed-powers.json", json.dumps({key: "Reviewed." for key in keys}))
+
+    def test_a_plain_skill_needs_no_review(self):
+        self.assertEqual(check.check_powers(self.root), [])
+
+    def test_unreviewed_script_fails(self):
+        write(self.root, "plugins/demo/skills/demo/scripts/run.py", "print(1)\n")
+        self.assertTrue(check.check_powers(self.root))
+
+    def test_unreviewed_hooks_fail(self):
+        write(self.root, "plugins/demo/hooks/hooks.json", "{}\n")
+        self.assertTrue(check.check_powers(self.root))
+
+    def test_unreviewed_mcp_server_fails(self):
+        write(self.root, "plugins/demo/.mcp.json", "{}\n")
+        self.assertTrue(check.check_powers(self.root))
+
+    def test_unreviewed_allowed_tools_fail(self):
+        write(self.root, "plugins/demo/skills/demo/SKILL.md", GOOD_SKILL.replace("---\n\n#", "allowed-tools: Bash\n---\n\n#"))
+        self.assertTrue(check.check_powers(self.root))
+
+    def test_reviewed_power_passes(self):
+        write(self.root, "plugins/demo/hooks/hooks.json", "{}\n")
+        self.review("plugins/demo/hooks")
+        self.assertEqual(check.check_powers(self.root), [])
 
 
 class HistoryTests(unittest.TestCase):
