@@ -19,7 +19,7 @@
     {
       "name": "claude-code-guards",
       "source": "./plugins/claude-code-guards",
-      "description": "Claude Code hooks that ask before pushes, destructive commands and connector sends, keep secrets out of reach, plus a hardened settings template"
+      "description": "Claude Code hooks that ask before pushes, destructive commands and connector sends, keep secrets out of reach, flag prompt injection, plus a hardened settings template"
     },
     {
       "name": "claude-code-session-meter",
