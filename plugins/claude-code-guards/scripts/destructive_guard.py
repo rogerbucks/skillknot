@@ -127,7 +127,7 @@ def risks(command, cwd, rebuildable=()):
             found.append(reason)
     if SQL.search(command or ""):
         found.append("a SQL `DROP` or `TRUNCATE` removes a table and its data")
-    elif DELETE_NO_WHERE.search(command or ""):
+    if DELETE_NO_WHERE.search(command or ""):
         found.append("a SQL `DELETE` with no `WHERE` empties the whole table")
     return found
 
