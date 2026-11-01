@@ -66,6 +66,9 @@ so you can install only the ones you want.
 - **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and
   connector sends, flag prompt injection, and keep secrets out of reach, plus a hardened
   `settings.json` template. **Claude Code only**
+- **`claude-code-context-advisor`:** reads a session's record and says what is filling the
+  context: big files read whole, repeat reads, heavy output, when to compact or start fresh, and
+  when a subagent or cheaper model would do. **Claude Code only**
 - **`claude-code-session-meter`:** a status line showing branch, unpushed work, context, cost and
   time, a cap that warns when a session runs long or costly, and a reminder to hand off before
   stopping. **Claude Code only**
