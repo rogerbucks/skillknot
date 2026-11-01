@@ -5,7 +5,7 @@ throughout. This file holds the reasoning that the code cannot.
 
 ## What is live on `main`
 
-**21 plugins, one skill each.** The README lists them all. In groups:
+**22 plugins, one skill each.** The README lists them all. In groups:
 
 - **Improve and review:** `gauntlet` (builder and critic rounds against a bar), `adversarial-review`
   (a hostile expert panel by region, phase and industry), `private-words` (keeps private words out
@@ -24,6 +24,10 @@ throughout. This file holds the reasoning that the code cannot.
   agent orders. `claude-code-session-meter` adds a status line, a cost, time and prompt cap, and a
   handoff reminder
 - **One app:** `obsidian-canvas`
+- **Early access, Claude Code mods:** `planning-panel`, a pane beside the chat that fills in as the
+  owner plans (goal, audience, limits, open questions, next steps). Claude fills it through the
+  mod's `update_plan` tool; `design-brief` and `slide-storyline` point at it. The skill alone keeps
+  the same plan in the chat, so it works without mods
 - **The gate:** pull requests only, rebase merges only, and `checks`, `lint` and `review` must
   pass. Links are checked locally, not in CI: `python3 scripts/links.py`
 - **Automatic review and merge:** `review.yml` has an automated reviewer read each pull request
@@ -49,7 +53,10 @@ automated review, but none has run in a real session yet.
 4. **Run each new skill as a stranger:** `slide-storyline`, `chart-picker`, `design-brief`,
    `threat-model` and `model-picker`. Paper runs earn their keep: the one for `private-words`
    found a word leaking through a printed file name
-5. **Known small gaps,** left on purpose: the tripwire can flag an ordinary line that starts with
+5. **Try `planning-panel` live** once mods are switched on: plan something, check the pane opens
+   on the first `update_plan` call, then try `/plan-panel copy` and `/plan-panel clear`. Its
+   tests pass under `claude plugin test`, but it has not drawn in a real session
+6. **Known small gaps,** left on purpose: the tripwire can flag an ordinary line that starts with
    "System:", and the handoff reminder treats any skill call that mentions "handoff" as a handoff
 
 ## How to ship a change here
@@ -81,6 +88,21 @@ automated review, but none has run in a real session yet.
   sanctions and export, safety and environment, child safety and charity codes, professional
   conduct. Fill those one region at a time
 - **Not proven:** no live run yet, and no stranger dry-run beyond the author's paper run
+
+## Mods: what to know
+
+- **A mod is a Claude Code plugin with a hooks module** (`hooks/hooks.json` naming
+  `register.tsx`). It needs Claude Code's early-access switch today, and is expected to roll out
+  generally. Until then the README lists mods in their own early-access section, so nobody
+  installs one by accident
+- **Mods cannot start with `claude-`.** `claude plugin validate` refuses that prefix as reserved,
+  so `planning-panel` breaks the repo's habit of naming Claude Code only plugins `claude-code-*`.
+  Its README, skill and marketplace entry say Claude Code instead
+- **Check a mod by hand before a push:** `claude plugin validate plugins/<mod>` and
+  `claude plugin test plugins/<mod>`. CI runs neither yet, because both need Claude Code. Adding
+  them to CI is a later choice for the owner
+- **The engine writes `.claude-plugin/types/`** beside a loaded mod for the editor. It is ignored
+  by the mod's `.gitignore` and never committed
 
 ## Why it is built this way
 

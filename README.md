@@ -78,6 +78,15 @@ so you can install only the ones you want.
 - **`obsidian-canvas`:** build and verify Obsidian canvas files that read as an argument, and work
   on desktop and mobile
 
+### Early access: Claude Code mods
+
+These need Claude Code's early-access switch for mods. Install them only if yours has it on.
+
+- **`planning-panel`:** a pane beside the chat that fills in as you plan: goal, audience, limits,
+  open questions and next steps. Ties in with `design-brief` and `slide-storyline`. The skill
+  alone works anywhere and keeps the same plan in the chat. **Claude Code early access only for
+  the pane**
+
 **Status of the skills added on 1 Nov 2026:** the presentation, design, threat model and model
 picker skills were written fresh from published methods and have had no live run yet. The rest
 were each rewritten from a method in private use and dry-run on paper, but none has yet had a
