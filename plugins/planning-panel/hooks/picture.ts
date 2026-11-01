@@ -25,8 +25,9 @@ const MIN_WIDTH = 300
 const MAX_WIDTH = 560
 const CELL = 8
 
+// A pane that reports no width gets the narrowest picture, which fits anywhere.
 export const widthFor = (columns: number): number =>
-  Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, columns * CELL))
+  Number.isFinite(columns) ? Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, columns * CELL)) : MIN_WIDTH
 
 // The step a question holds up, or nothing if the number names no step.
 const stepOf = (p: Plan, question: Question): number | undefined =>

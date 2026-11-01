@@ -138,16 +138,16 @@ const questions = (value: unknown, fallback: Question[]): Question[] =>
     : fallback
 
 // A bare sentence keeps the done mark of the step it repeats, so adding a step undoes nothing.
-const steps = (value: unknown, fallback: Step[]): Step[] =>
-  Array.isArray(value)
-    ? entries(value).map(({ text, done }) => ({
-        text,
-        isDone:
-          typeof done === 'boolean'
-            ? done
-            : fallback.some(one => one.text === text && one.isDone),
-      }))
-    : fallback
+// Each earlier step is matched once, so two steps with the same wording keep their own marks.
+const steps = (value: unknown, fallback: Step[]): Step[] => {
+  if (!Array.isArray(value)) return fallback
+  const unmatched = [...fallback]
+  return entries(value).map(({ text, done }) => {
+    const at = unmatched.findIndex(one => one.text === text)
+    const [before] = at < 0 ? [] : unmatched.splice(at, 1)
+    return { text, isDone: typeof done === 'boolean' ? done : (before?.isDone ?? false) }
+  })
+}
 
 export const applyChange = (before: Plan, change: Change): Plan => {
   const base = change.clear === true ? EMPTY : before

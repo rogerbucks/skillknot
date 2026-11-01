@@ -127,6 +127,17 @@ test('a repeated step keeps its done mark unless the call changes it', async ($,
   await ui.unmount()
 })
 
+test('two steps with the same wording keep their own done marks', async ($, on) => {
+  engine(on)
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+
+  await $.tool.call({ tool: TOOL, next_steps: [{ text: 'Check', done: true }, 'Check'] })
+  await $.tool.call({ tool: TOOL, next_steps: ['Check', 'Check'] })
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ type: 'Text', text: /1 of 2 done/ })).toBeDefined()
+  await ui.unmount()
+})
+
 test('clear starts a new plan', async ($, on) => {
   engine(on)
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
@@ -192,4 +203,9 @@ test('the fullest plan stays inside what the surface will take', () => {
   const questions = Array.from({ length: 12 }, (_, index) => ({ text, step: index + 1 }))
   const fullest = plan({ goal: text, audience: text, limits: Array(12).fill(text), steps, questions })
   expect(drawPlan(fullest, widthFor(1)).length).toBeLessThan(131072)
+})
+
+test('a pane that reports no width gets the narrowest picture', () => {
+  expect(widthFor(Number.NaN)).toBe(widthFor(1))
+  expect(widthFor(undefined as unknown as number)).toBe(widthFor(1))
 })
