@@ -10,6 +10,61 @@
       "name": "gauntlet",
       "source": "./plugins/gauntlet",
       "description": "Improve one existing item against a stated bar, inside a spending cap"
+    },
+    {
+      "name": "capability-ladder",
+      "source": "./plugins/capability-ladder",
+      "description": "When a task exposes a missing capability: check what exists, pick the cheapest fix, propose before installing"
+    },
+    {
+      "name": "claude-code-guards",
+      "source": "./plugins/claude-code-guards",
+      "description": "Claude Code hooks that ask before pushes and connector sends, keep secrets out of reach, plus a hardened settings template"
+    },
+    {
+      "name": "context-budget",
+      "source": "./plugins/context-budget",
+      "description": "Measure an agent setup's always-loaded context and hook latency against budgets, and fix by relocating"
+    },
+    {
+      "name": "document-bundle",
+      "source": "./plugins/document-bundle",
+      "description": "Keep one source document and derive every audience version from it, so copies never drift"
+    },
+    {
+      "name": "handoff",
+      "source": "./plugins/handoff",
+      "description": "End a working session with nothing left only in the chat: sweep, persist, release, verify, report"
+    },
+    {
+      "name": "obsidian-canvas",
+      "source": "./plugins/obsidian-canvas",
+      "description": "Build, lay out and verify Obsidian canvas files that read as an argument, not a picture"
+    },
+    {
+      "name": "ownership-map",
+      "source": "./plugins/ownership-map",
+      "description": "Trace who ultimately controls a company, what else they hold, and where interests align"
+    },
+    {
+      "name": "polish-document",
+      "source": "./plugins/polish-document",
+      "description": "Turn a rough capture into a professional document: gaps first, then review, format and diagrams"
+    },
+    {
+      "name": "read-only-researcher",
+      "source": "./plugins/read-only-researcher",
+      "description": "Research web questions and report sourced findings, without acting or sending anything"
+    },
+    {
+      "name": "taxonomy-review",
+      "source": "./plugins/taxonomy-review",
+      "description": "Review a folder or category structure and recommend merges and splits, without moving anything"
+    },
+    {
+      "name": "verdict-first",
+      "source": "./plugins/verdict-first",
+      "description": "A verdict-first, low-filler reply style for readers who skim, with a Claude Code output style"
     }
   ]
 }

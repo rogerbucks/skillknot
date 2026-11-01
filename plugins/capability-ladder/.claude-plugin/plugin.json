@@ -1,0 +1,6 @@
+{
+  "name": "capability-ladder",
+  "description": "When a task exposes a missing capability: check what exists, pick the cheapest fix, propose before installing",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}

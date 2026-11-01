@@ -1,0 +1,6 @@
+{
+  "name": "document-bundle",
+  "description": "Keep one source document and derive every audience version from it, so copies never drift",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}

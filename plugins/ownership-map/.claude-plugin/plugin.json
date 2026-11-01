@@ -1,0 +1,6 @@
+{
+  "name": "ownership-map",
+  "description": "Trace who ultimately controls a company, what else they hold, and where interests align",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}

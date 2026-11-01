@@ -1,1 +1,5 @@
-{}
+{
+  "plugins/claude-code-guards/hooks": "Registers three PreToolUse hooks that only answer ask, deny or nothing. None edits files, sends data or allows a call the person's settings would block. A failing guard asks rather than allowing.",
+  "plugins/claude-code-guards/scripts": "Python standard library only. Reads the hook input and, for pushes, runs read-only git commands (remote get-url, rev-parse, log). Writes only an empty per-session marker in the system temp folder. Tested in scripts/test_guards.py.",
+  "plugins/read-only-researcher/agents": "One subagent limited to Read, Grep, Glob, WebSearch and WebFetch, with Bash, Edit, Write, NotebookEdit and Agent disallowed, so it cannot change files, run commands or delegate."
+}

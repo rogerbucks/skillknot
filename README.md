@@ -12,6 +12,43 @@ so you can install only the ones you want.
   are in [references/sources.md](plugins/gauntlet/skills/gauntlet/references/sources.md).
   **Status: early.** The method has been piloted by hand, but the skill has not yet had a full run.
 
+### Working sessions and documents
+
+- **`handoff`:** end a session with nothing left only in the chat. Sweeps decisions, findings and
+  next steps into their homes, releases claims, cleans up test files and reports what to pick up
+- **`polish-document`:** turn a rough capture into a professional document. Missing sections
+  first, then review, Markdown format and diagrams, with proposed additions kept separate
+- **`document-bundle`:** keep one source document and derive every audience version from it, so
+  copies never drift
+- **`verdict-first`:** a reply style for readers who skim: verdict first, one recommendation,
+  honest confidence. Ships a Claude Code output style too
+
+### Research and analysis
+
+- **`ownership-map`:** trace who ultimately controls a company, what else they hold, and where
+  interests align, without asserting collusion
+- **`read-only-researcher`:** sourced findings from published sources, never action. Ships a
+  Claude Code subagent with read-only tools
+- **`taxonomy-review`:** recommend merges and splits of folders or categories, with an honest
+  confidence for each, and never move a file unasked
+
+### Running an agent setup
+
+- **`capability-ladder`:** when a capability is missing, check what exists, pick the cheapest
+  fix, and propose before installing anything
+- **`context-budget`:** measure always-loaded context and hook latency against budgets, and fix a
+  breach by moving material, not deleting it
+- **`claude-code-guards`:** Claude Code hooks that ask before pushes and connector sends, and keep
+  secrets out of reach, plus a hardened `settings.json` template. **Claude Code only**
+
+### Tools for one app
+
+- **`obsidian-canvas`:** build and verify Obsidian canvas files that read as an argument, and work
+  on desktop and mobile
+
+**Status of the skills added on 1 Nov 2026:** each was rewritten from a method in private use and
+dry-run on paper, but none has yet had a full run as a stranger. Treat them as early.
+
 ## Install
 
 In Claude Code:
@@ -24,7 +61,9 @@ claude plugin marketplace add rogerbucks/skillknot
 claude plugin install gauntlet@skillknot
 ```
 
-Then run it as `/gauntlet:gauntlet <item>`.
+Install any other skill the same way, as `<name>@skillknot`. Then run it as `/<name>:<name>`,
+for example `/gauntlet:gauntlet <item>`. Step-by-step notes, including the guards and the hardened
+settings, are in [docs/INSTALL.md](docs/INSTALL.md).
 
 For another agent, or to read before you trust it, copy the skill's folder from
 `plugins/<name>/skills/<name>` into that agent's skills folder.

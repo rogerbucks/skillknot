@@ -1,0 +1,6 @@
+{
+  "name": "read-only-researcher",
+  "description": "Research web questions and report sourced findings, without acting or sending anything",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}

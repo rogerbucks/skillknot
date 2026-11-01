@@ -1,0 +1,6 @@
+{
+  "name": "taxonomy-review",
+  "description": "Review a folder or category structure and recommend merges and splits, without moving anything",
+  "author": { "name": "rogerbucks" },
+  "license": "MIT"
+}
