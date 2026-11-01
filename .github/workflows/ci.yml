@@ -46,8 +46,8 @@ jobs:
         run: npx --yes markdownlint-cli2@0.24.0 '**/*.md'
       - name: Python
         run: |
-          pipx run ruff==0.17.3 check scripts
-          pipx run ruff==0.17.3 format --check scripts
+          pipx run ruff==0.17.3 check scripts plugins
+          pipx run ruff==0.17.3 format --check scripts plugins
       - name: Shell
         run: shellcheck .githooks/pre-push .githooks/pre-commit
       - name: Workflow syntax

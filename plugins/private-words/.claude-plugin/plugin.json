@@ -1,0 +1,8 @@
+{
+  "name": "private-words",
+  "description": "Keep private words out of a repo, with the list held only where the user chooses",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}
