@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -310,12 +311,13 @@ class Tripwire(unittest.TestCase):
             )
         )
         self.assertIsNone(run_hook({"tool_name": "Read", "tool_response": attack}))
-        self.assertIsNotNone(
-            run_hook(
-                {"tool_name": "Read", "tool_response": attack},
-                {"tripwire_tools": ["Read"]},
-            )
+        hooks = json.loads(
+            (GUARDS.parent / "hooks" / "hooks.json").read_text(encoding="utf-8")
         )
+        matcher = hooks["hooks"]["PostToolUse"][0]["matcher"]
+        for tool in ("WebFetch", "WebSearch", "mcp__mail__read_email"):
+            self.assertTrue(re.fullmatch(matcher, tool), tool)
+            self.assertTrue(injection_tripwire.watched(tool), tool)
         self.assertIsNone(
             run_hook(
                 {"tool_name": "WebFetch", "tool_response": attack},

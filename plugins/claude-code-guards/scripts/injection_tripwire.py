@@ -8,8 +8,8 @@ Writes: nothing.
 
 It never blocks or edits the result. It adds a reminder beside it, and shows the person which
 kind of text matched, never the text itself. Best effort: a careful attacker can phrase around
-any list, so the other guards and the person's review still matter. Extra tools to watch, such as
-"Read", go in the overlay as "tripwire_tools".
+any list, so the other guards and the person's review still matter. The hook's matcher decides
+which tools reach it; the check below repeats it so a wider matcher stays safe.
 """
 
 import json
@@ -70,15 +70,15 @@ def findings(text):
     return found
 
 
-def watched(tool, config):
-    return bool(WATCHED.match(tool)) or tool in config.get("tripwire_tools", [])
+def watched(tool):
+    return bool(WATCHED.match(tool))
 
 
 def main():
     event = read_input()
     config = load_config()
     tool = event.get("tool_name", "")
-    if is_off(config, "tripwire") or not watched(tool, config):
+    if is_off(config, "tripwire") or not watched(tool):
         return 0
     try:
         found = findings(as_text(event.get("tool_response", "")))
