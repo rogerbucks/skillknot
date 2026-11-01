@@ -10,6 +10,11 @@
       "name": "gauntlet",
       "source": "./plugins/gauntlet",
       "description": "Improve one existing item against a stated bar, inside a spending cap"
+    },
+    {
+      "name": "private-words",
+      "source": "./plugins/private-words",
+      "description": "Keep private words out of a repo, with the list held only where the user chooses"
     }
   ]
 }

@@ -1,1 +1,3 @@
-{}
+{
+  "plugins/private-words/skills/private-words/scripts": "scan.py reads the user's list, the repo and its Git log. Its only write is gh secret set, on request, by standard input. It prints no word."
+}

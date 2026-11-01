@@ -12,6 +12,9 @@ so you can install only the ones you want.
   are in [references/sources.md](plugins/gauntlet/skills/gauntlet/references/sources.md).
   **Status: early.** The method has been piloted by hand, but the skill has not yet had a full run.
 
+- **`private-words`:** keep private words out of a repo. The list lives only where you choose,
+  outside every repo, and a script scans files and history without ever showing a word.
+
 ## Install
 
 In Claude Code:
@@ -21,10 +24,10 @@ claude plugin marketplace add rogerbucks/skillknot
 ```
 
 ```bash
-claude plugin install gauntlet@skillknot
+claude plugin install <skill>@skillknot
 ```
 
-Then run it as `/gauntlet:gauntlet <item>`.
+Then run it as `/<skill>:<skill>`, for example `/gauntlet:gauntlet <item>`.
 
 For another agent, or to read before you trust it, copy the skill's folder from
 `plugins/<name>/skills/<name>` into that agent's skills folder.
