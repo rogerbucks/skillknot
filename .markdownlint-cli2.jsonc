@@ -1,0 +1,10 @@
+{
+  "config": {
+    "default": true,
+    // Long lines are fine: skills wrap for reading, and agents do not care.
+    "MD013": false,
+    // A bold lead-in is a list item's opening, not a heading.
+    "MD036": false
+  },
+  "ignores": ["node_modules"]
+}

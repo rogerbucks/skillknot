@@ -7,9 +7,9 @@
   },
   "plugins": [
     {
-      "name": "gauntlet",
-      "source": "./plugins/gauntlet",
-      "description": "Improve one existing item against a stated bar, inside a spending cap"
+      "name": "adversarial-review",
+      "source": "./plugins/adversarial-review",
+      "description": "Hostile expert-panel review of one or more items against audiences, styles, standards and obligations, by region"
     },
     {
       "name": "capability-ladder",
@@ -32,6 +32,11 @@
       "description": "Keep one source document and derive every audience version from it, so copies never drift"
     },
     {
+      "name": "gauntlet",
+      "source": "./plugins/gauntlet",
+      "description": "Improve one existing item against a stated bar, inside a spending cap"
+    },
+    {
       "name": "handoff",
       "source": "./plugins/handoff",
       "description": "End a working session with nothing left only in the chat: sweep, persist, release, verify, report"
@@ -50,6 +55,11 @@
       "name": "polish-document",
       "source": "./plugins/polish-document",
       "description": "Turn a rough capture into a professional document: gaps first, then review, format and diagrams"
+    },
+    {
+      "name": "private-words",
+      "source": "./plugins/private-words",
+      "description": "Keep private words out of a repo, with the list held only where the user chooses"
     },
     {
       "name": "read-only-researcher",

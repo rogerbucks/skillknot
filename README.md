@@ -12,6 +12,17 @@ so you can install only the ones you want.
   are in [references/sources.md](plugins/gauntlet/skills/gauntlet/references/sources.md).
   **Status: early.** The method has been piloted by hand, but the skill has not yet had a full run.
 
+- **`adversarial-review`:** a hostile expert panel attacks one or more items before they ship. It
+  profiles each item's audiences, language style, expectations, standards and legal obligations
+  by region and by company lifecycle phase and industry, proposes the experts with reasons for you
+  to confirm, always runs any lens you ask for, and cites every finding to a linked source. Default
+  registries cover global standards, the US, EU, UK, Australia and New Zealand, Asia Pacific and
+  Canada. Each source is a link with a cached note, rechecked when over a week old.
+  **Status: early.** Paper design only, no live run yet.
+
+- **`private-words`:** keep private words out of a repo. The list lives only where you choose,
+  outside every repo, and a script scans files and history without ever showing a word.
+
 ### Working sessions and documents
 
 - **`handoff`:** end a session with nothing left only in the chat. Sweeps decisions, findings and
@@ -58,12 +69,11 @@ claude plugin marketplace add rogerbucks/skillknot
 ```
 
 ```bash
-claude plugin install gauntlet@skillknot
+claude plugin install <skill>@skillknot
 ```
 
-Install any other skill the same way, as `<name>@skillknot`. Then run it as `/<name>:<name>`,
-for example `/gauntlet:gauntlet <item>`. Step-by-step notes, including the guards and the hardened
-settings, are in [docs/INSTALL.md](docs/INSTALL.md).
+Then run it as `/<skill>:<skill>`, for example `/gauntlet:gauntlet <item>`. Step-by-step notes,
+including the guards and the hardened settings, are in [docs/INSTALL.md](docs/INSTALL.md).
 
 For another agent, or to read before you trust it, copy the skill's folder from
 `plugins/<name>/skills/<name>` into that agent's skills folder.
@@ -88,7 +98,8 @@ A skill belongs here if it would work, unchanged and useful, for someone else on
 `main` takes only changes that pass CI. The check looks for home folder paths, personal email
 addresses, secrets, hidden text and a list of private words kept outside the repo, and it tests
 each skill's format. Anything that lets a plugin act, such as a hook, a script or a tool permission,
-needs a reviewed line in `reviewed-powers.json`. Turn on the same check for your own pushes with `git config core.hooksPath .githooks`.
+needs a reviewed line in `reviewed-powers.json`. Run `python3 scripts/tidy.py` to fix file layout. `git config core.hooksPath .githooks` runs that
+before each commit and the same check before each push.
 
 ## Vendors
 
