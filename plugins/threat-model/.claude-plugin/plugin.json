@@ -1,0 +1,8 @@
+{
+  "name": "threat-model",
+  "description": "A plain-English threat model for a feature, process, vendor or plan: what could go wrong, how likely, how bad, and the cheapest fixes first",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

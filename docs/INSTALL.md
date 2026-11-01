@@ -35,6 +35,11 @@ voice and rules there. That file stays on your machine, so the skills can stay g
 | `verdict-first` | How to address you, language variant |
 | `obsidian-canvas` | Colour scheme, icon vocabulary, node sizes |
 | `context-budget` | Files to measure, budgets, where to record runs |
+| `slide-storyline` | House template, slide limit, audiences you present to |
+| `chart-picker` | Brand colours, fonts, charting tool |
+| `design-brief` | House style, brand rules, accessibility level |
+| `threat-model` | Rules you must meet, risk appetite, key systems |
+| `model-picker` | Models you can use, your prices, data rules |
 
 `claude-code-guards` reads JSON instead, at `~/.config/skillknot/claude-code-guards.json`. See
 its [skill](../plugins/claude-code-guards/skills/claude-code-guards/SKILL.md).

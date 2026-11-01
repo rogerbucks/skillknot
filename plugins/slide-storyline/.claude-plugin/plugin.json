@@ -1,0 +1,8 @@
+{
+  "name": "slide-storyline",
+  "description": "Turn a topic, notes or data into a deck storyline: one headline claim per slide, evidence under it, built to survive a skim",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}

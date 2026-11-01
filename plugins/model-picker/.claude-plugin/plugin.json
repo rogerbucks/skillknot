@@ -1,0 +1,8 @@
+{
+  "name": "model-picker",
+  "description": "Match each task to the cheapest AI model and effort level that can do it well, and say what that saves",
+  "author": {
+    "name": "rogerbucks"
+  },
+  "license": "MIT"
+}
