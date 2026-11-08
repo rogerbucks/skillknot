@@ -326,6 +326,38 @@ class Tripwire(unittest.TestCase):
         )
 
 
+class EveryToolMatcher(unittest.TestCase):
+    """The secret and connector guards run before every tool but one: a chat surface's "no reply needed" marker,
+    which sends nothing and reads no file. Claude Code reads the matcher as a regular expression (checked
+    8 Nov 2026: a lookahead matcher skipped the named tool and still matched the others)."""
+
+    def test_skips_only_no_reply_needed(self):
+        hooks = json.loads(
+            (GUARDS.parent / "hooks" / "hooks.json").read_text(encoding="utf-8")
+        )
+        block = next(
+            b
+            for b in hooks["hooks"]["PreToolUse"]
+            if any("secret_guard.py" in h["command"] for h in b["hooks"])
+        )
+        self.assertTrue(
+            any("connector_guard.py" in h["command"] for h in block["hooks"])
+        )
+        matcher = block["matcher"]
+        self.assertIsNone(re.search(matcher, "mcp__hearthbot__no_reply_needed"))
+        for tool in (
+            "Bash",
+            "Read",
+            "Write",
+            "WebFetch",
+            "mcp__hearthbot__post_message",
+            "mcp__hearthbot__add_reaction",
+            "mcp__hearthbot__no_reply_needed_x",
+            "mcp__mail__send_email",
+        ):
+            self.assertIsNotNone(re.search(matcher, tool), tool)
+
+
 class Connector(unittest.TestCase):
     def test_flow(self):
         session = f"test-{os.getpid()}"
