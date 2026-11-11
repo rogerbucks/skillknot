@@ -56,6 +56,7 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   "own_github_owners": ["your-github-handle", "your-org"],
   "allow_paths": ["/exact/path/to/a/file/you/trust"],
   "rebuildable": ["node_modules", "dist", "__pycache__"],
+  "connector_trusted_servers": ["your-chat-server"],
   "off": []
 }
 ```
@@ -65,6 +66,9 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 - **`allow_paths`:** exact paths the secret guard lets through. Use whole paths, not patterns
 - **`rebuildable`:** folder names a recursive delete may remove without a prompt, when it removes
   only those. Use them for folders a build makes again
+- **`connector_trusted_servers`:** MCP server names whose own tools the connector guard never
+  asks about, such as a chat surface that only talks to you. Reads through them still count as
+  reading messages, so an outbound call from another tool afterwards still asks
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 

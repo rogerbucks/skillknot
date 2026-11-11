@@ -348,6 +348,28 @@ class Connector(unittest.TestCase):
             if os.path.exists(marker):
                 os.unlink(marker)
 
+    def test_trusted_servers(self):
+        session = f"test-trusted-{os.getpid()}"
+        marker = connector_guard.marker(session)
+        if os.path.exists(marker):
+            os.unlink(marker)
+        config = {"connector_trusted_servers": ["chat"]}
+        call = lambda tool: connector_guard.decide(
+            {"tool_name": tool, "tool_input": {}, "session_id": session}, config
+        )
+        try:
+            self.assertIsNone(call("mcp__chat__post_message"))
+            self.assertIsNone(call("mcp__chat__delete_message"))
+            self.assertEqual(call("mcp__mail__send_email")[0], "ask")
+            self.assertEqual(call("mcp__chatx__post_message")[0], "ask")
+            self.assertIsNone(call("mcp__chat__read_thread"))
+            self.assertTrue(os.path.exists(marker))
+            self.assertIsNone(call("mcp__chat__post_message"))
+            self.assertEqual(call("WebFetch")[0], "ask")
+        finally:
+            if os.path.exists(marker):
+                os.unlink(marker)
+
 
 if __name__ == "__main__":
     unittest.main()
