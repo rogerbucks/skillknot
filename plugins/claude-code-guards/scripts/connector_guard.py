@@ -9,6 +9,10 @@ Writes: one empty marker file per session in the system temp folder, once untrus
 
 Why the second rule: a message can carry hidden instructions. This stops one from steering a read
 straight into a leak without a person seeing it. Turn it off with "off": ["connector"] in the overlay.
+
+Trusted servers: "connector_trusted_servers": ["name"] in the overlay stops both asks for that MCP
+server's own tools, for example a chat surface whose posts go only to its own user. Reads through it
+still count as reading messages, so a later outbound call from another tool still asks.
 """
 
 import hashlib
@@ -35,6 +39,12 @@ OUTBOUND_VERB = re.compile(
 )
 
 
+def server(tool):
+    """The MCP server's name in mcp__<server>__<tool>, or None for a built-in tool."""
+    match = re.match(r"^mcp__(.+?)__.+$", tool)
+    return match.group(1) if match else None
+
+
 def leaf(tool):
     """The tool's own name, after mcp__<server>__."""
     match = re.match(r"^mcp__.+?__(.+)$", tool)
@@ -51,6 +61,10 @@ def decide(event, config):
     session = event.get("session_id", "")
     name = leaf(tool)
     is_mcp = tool.startswith("mcp__")
+    if is_mcp and server(tool) in config.get("connector_trusted_servers", []):
+        if READ_VERB.search(name) and MESSAGE_NOUN.search(name):
+            open(marker(session), "a").close()
+        return None
     if is_mcp and ALWAYS_ASK.search(name):
         return (
             "ask",
