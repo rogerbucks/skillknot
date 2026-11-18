@@ -5,9 +5,11 @@ Usage: imported by the hook scripts beside it.
 Writes: nothing.
 
 The overlay is optional JSON at ~/.config/skillknot/claude-code-guards.json, for example:
-  {"own_github_owners": ["your-handle"], "allow_paths": ["/exact/path/you/trust"], "off": ["connector"]}
+  {"own_github_owners": ["your-handle"], "allow_paths": ["/exact/path/you/trust"], "off": ["connector"],
+   "quiet_tools": [{"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}]}
 """
 
+import fnmatch
 import json
 import os
 import re
@@ -32,6 +34,23 @@ def load_config(path=None):
 
 def is_off(config, guard):
     return guard in config.get("off", [])
+
+
+def quiet_here(config, tool, cwd, home=None):
+    """True when the overlay's "quiet_tools" lists this exact tool for the session's folder.
+    Each entry is {"tool": exact tool name, "folders": [folder, ...]}. A folder may use `*` and
+    matches itself and anything under it. Opt-in per tool and per folder; nothing else is quieted."""
+    for entry in config.get("quiet_tools", []):
+        if not isinstance(entry, dict) or entry.get("tool") != tool:
+            continue
+        here = expand(cwd or ".", os.getcwd(), home)
+        for folder in entry.get("folders", []):
+            pattern = expand(str(folder), os.getcwd(), home).rstrip("/")
+            if fnmatch.fnmatchcase(here, pattern) or fnmatch.fnmatchcase(
+                here, pattern + "/*"
+            ):
+                return True
+    return False
 
 
 def words(segment):

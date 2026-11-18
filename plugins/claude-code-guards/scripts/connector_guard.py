@@ -8,7 +8,8 @@ Usage: a PreToolUse hook on every tool (see ../hooks/hooks.json). To try it by h
 Writes: one empty marker file per session in the system temp folder, once untrusted messages are read.
 
 Why the second rule: a message can carry hidden instructions. This stops one from steering a read
-straight into a leak without a person seeing it. Turn it off with "off": ["connector"] in the overlay.
+straight into a leak without a person seeing it. Turn it off with "off": ["connector"] in the overlay, or quiet one
+exact tool in chosen folders only with "quiet_tools" (see claude-code-guards/SKILL.md).
 """
 
 import hashlib
@@ -17,7 +18,7 @@ import re
 import sys
 import tempfile
 
-from guardlib import run
+from guardlib import quiet_here, run
 
 ALWAYS_ASK = re.compile(
     r"(^|_)(send|forward|reply|rsvp|post|publish|share|delete|trash|remove|transfer|pay|invoice)(_|$)",
@@ -52,6 +53,8 @@ def decide(event, config):
     name = leaf(tool)
     is_mcp = tool.startswith("mcp__")
     if is_mcp and ALWAYS_ASK.search(name):
+        if quiet_here(config, tool, event.get("cwd")):
+            return None  # the overlay's "quiet_tools" names this tool for this folder
         return (
             "ask",
             f"Connector guard: `{name}` sends, shares or removes something outside this machine. Approve it this once?",
