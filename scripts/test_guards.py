@@ -350,6 +350,32 @@ class Connector(unittest.TestCase):
         self.assertEqual(ask("mcp__y__send_message", "/work/app"), "ask")
         self.assertEqual(ask("mcp__x__delete_file", "/work/app"), "ask")
 
+    def test_quiet_tools_still_asks_after_messages_were_read(self):
+        cfg = {
+            "quiet_tools": [{"tool": "mcp__x__send_message", "folders": ["/work/app"]}]
+        }
+        session = f"quiet-{os.getpid()}"
+        marker = connector_guard.marker(session)
+        call = lambda tool: hook(
+            "connector_guard.py",
+            {
+                "tool_name": tool,
+                "tool_input": {},
+                "session_id": session,
+                "cwd": "/work/app",
+            },
+            cfg,
+        )
+        try:
+            self.assertIsNone(call("mcp__x__send_message"))
+            self.assertIsNone(
+                call("mcp__mail__search_email")
+            )  # reads mail: sets the marker
+            self.assertEqual(call("mcp__x__send_message"), "ask")
+        finally:
+            if os.path.exists(marker):
+                os.unlink(marker)
+
     def test_flow(self):
         session = f"test-{os.getpid()}"
         marker = connector_guard.marker(session)
