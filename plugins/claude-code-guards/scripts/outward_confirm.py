@@ -6,8 +6,10 @@ Usage: a PreToolUse hook on Bash (see ../hooks/hooks.json). To try it by hand:
   echo '{"tool_name":"Bash","tool_input":{"command":"git push"},"cwd":"."}' | python3 outward_confirm.py
 Writes: nothing. It reads the repo with read-only git commands.
 
-Owners you trust for `gh` writes go in the overlay as "own_github_owners". A push always asks,
-because the point is to see what is going out. Best effort: it reads the obvious spellings of a
+Owners you trust for `gh` writes go in the overlay as "own_github_owners". A push asks, because the
+point is to see what is going out, unless the overlay's "quiet_pushes" names its repo: then a plain
+push of a feature branch goes through. Never a force, a delete, tags, --all/--mirror, or a push to
+main, master or the branch the remote calls its default. Best effort: it reads the obvious spellings of a
 command, never a program that pushes by itself.
 """
 
@@ -166,6 +168,52 @@ def capped(lines, most):
     )
 
 
+PROTECTED_BRANCHES = {"main", "master"}
+
+
+def repo_slug(url):
+    """'owner/name' (lower case) from a remote URL, or None."""
+    match = re.match(
+        r"^(?:[a-z+]+://)?(?:[^@/]+@)?[^/:]+[:/]([^/\s]+/[^/\s]+?)(?:\.git)?/?$",
+        url.strip(),
+        re.IGNORECASE,
+    )
+    return match.group(1).lower() if match else None
+
+
+def quiet_push(push, config, reader=git):
+    """True when the overlay's "quiet_pushes" lets this push through without a prompt:
+    its remote is a listed repo and it sends only plain, named, non-protected branches."""
+    entries = [e for e in config.get("quiet_pushes", []) if isinstance(e, dict)]
+    if not entries or push["force"] or push["delete"] or push["tags"] or push["all"]:
+        return False
+    ok, url = reader(push["dir"], "remote", "get-url", push["remote"])
+    slug = repo_slug(url) if ok else None
+    if not slug:
+        return False
+    listed = [
+        e for e in entries if slug in {str(r).lower() for r in e.get("repos", [])}
+    ]
+    if not listed:
+        return False
+    protected = set(PROTECTED_BRANCHES)
+    for entry in listed:
+        protected |= {str(b) for b in entry.get("never_branches", [])}
+    ok, head = reader(push["dir"], "rev-parse", "--abbrev-ref", "HEAD")
+    current = head.strip() if ok else ""
+    ok, default = reader(
+        push["dir"], "symbolic-ref", "--short", f"refs/remotes/{push['remote']}/HEAD"
+    )
+    if ok and default.strip():
+        protected.add(default.strip().split("/", 1)[-1])
+    targets = []
+    for spec in push["refspecs"] or [current]:
+        dest = spec.split(":", 1)[-1] if ":" in spec else spec
+        dest = dest.removeprefix("refs/heads/")
+        targets.append(current if dest == "HEAD" else dest)
+    return all(t and t not in protected and not t.startswith("refs/") for t in targets)
+
+
 def summarise(push, reader=git):
     ok, url = reader(push["dir"], "remote", "get-url", push["remote"])
     if not ok:
@@ -287,7 +335,9 @@ def decide(event, config):
         return None
     command = (event.get("tool_input") or {}).get("command", "")
     cwd = event.get("cwd") or "."
-    reasons = [summarise(p) for p in pushes_in(command, cwd)]
+    reasons = [
+        summarise(p) for p in pushes_in(command, cwd) if not quiet_push(p, config)
+    ]
     own = {o.lower() for o in config.get("own_github_owners", [])}
     for what, owner, release in gh_acts(command, cwd):
         if release or (owner or "").lower() not in own:
