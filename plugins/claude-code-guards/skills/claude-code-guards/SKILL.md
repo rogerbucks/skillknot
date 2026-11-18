@@ -12,7 +12,7 @@ either stays silent, asks the person, refuses the call, or adds a warning.
 
 | Guard | Fires on | Does |
 | --- | --- | --- |
-| **outward** | `git push`, and `gh` commands that write | Asks every time it sees a push, and shows the repo, target, commits and files. Asks for a `gh` write to a repo you do not own, and for any release |
+| **outward** | `git push`, and `gh` commands that write | Asks each time it sees a push (unless `quiet_pushes` allows a feature branch), and shows the repo, target, commits and files. Asks for a `gh` write to a repo you do not own, and for any release |
 | **destructive** | Shell commands | Asks before work is destroyed for good: a recursive `rm`, `git reset --hard`, `git clean -f`, `git checkout .`, `git branch -D`, a dropped stash, `find -delete`, a SQL `DROP`, `TRUNCATE` or `DELETE` with no `WHERE`, wiping a disk, and `terraform destroy` or `kubectl delete` |
 | **secret** | Every tool | Refuses a call that names a secret-shaped path, such as `.ssh/`, `.env` or a folder with "secret" in its name. Asks before credential tools run, and before text that looks like a live key is written |
 | **connector** | Connector (MCP) tools, and web tools | Asks before a connector sends, shares or deletes something. After the session has read mail or messages, also asks before anything that could carry that text out |
@@ -75,6 +75,10 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   read mail or messages, the tool asks again. It works only for tools the guard already asks about
   (names with send, post, delete and so on); an entry for any other tool does nothing, so check the
   exact name in a prompt before adding it
+- **`quiet_pushes`:** repos whose plain feature-branch pushes the outward guard stops asking about,
+  as `[{"repos": ["owner/name"], "never_branches": ["release"]}]`. It never lets through a force
+  push, a delete, tags, `--all`/`--mirror`, or a push to `main`, `master` or the branch the remote
+  calls its default (so `never_branches` only adds to that list). Every other push still asks
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 

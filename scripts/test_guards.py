@@ -64,6 +64,50 @@ class Outward(unittest.TestCase):
         self.assertEqual(find('cd "$HOME/x" && git push')[0]["dir"], "/srv/me/x")
         self.assertEqual(len(find("git push && git push origin main")), 2)
 
+    def test_quiet_pushes_only_for_listed_repo_and_feature_branches(self):
+        cfg = {"quiet_pushes": [{"repos": ["Acme/Tool"]}]}
+
+        def reader(url, branch="feature/x", default="origin/main"):
+            def read(folder, *args):
+                if args[0] == "remote":
+                    return True, url
+                if args[0] == "rev-parse":
+                    return True, branch + "\n"
+                if args[0] == "symbolic-ref":
+                    return (True, default + "\n") if default else (False, "")
+                return False, ""
+
+            return read
+
+        url = "https://github.com/acme/tool.git"
+        push = lambda c: outward_confirm.pushes_in(c, "/work")[0]
+        quiet = lambda c, r=None, cf=cfg: outward_confirm.quiet_push(
+            push(c), cf, r or reader(url)
+        )
+        self.assertTrue(quiet("git push"))
+        self.assertTrue(quiet("git push -u origin feature/x"))
+        self.assertTrue(quiet("git push origin HEAD"))
+        self.assertTrue(quiet("git push origin feature/x:feature/y"))
+        self.assertFalse(quiet("git push origin main"))
+        self.assertFalse(quiet("git push origin HEAD:main"))
+        self.assertFalse(quiet("git push origin feature/x:refs/heads/main"))
+        self.assertFalse(quiet("git push", reader(url, branch="main")))
+        self.assertFalse(
+            quiet("git push", reader(url, branch="trunk", default="origin/trunk"))
+        )
+        self.assertFalse(quiet("git push --force-with-lease"))
+        self.assertFalse(quiet("git push origin +feature/x"))
+        self.assertFalse(quiet("git push --delete origin feature/x"))
+        self.assertFalse(quiet("git push --tags"))
+        self.assertFalse(quiet("git push --all"))
+        self.assertFalse(quiet("git push", reader("https://github.com/other/tool.git")))
+        self.assertFalse(quiet("git push", None, {}))
+        self.assertFalse(quiet("git push", reader("")))
+        extra = {
+            "quiet_pushes": [{"repos": ["acme/tool"], "never_branches": ["release"]}]
+        }
+        self.assertFalse(quiet("git push origin release", None, extra))
+
     def test_owner_and_repo_name(self):
         self.assertEqual(
             outward_confirm.owner_of("https://github.com/acme/tool.git"), "acme"
