@@ -78,7 +78,9 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 - **`quiet_pushes`:** repos whose plain feature-branch pushes the outward guard stops asking about,
   as `[{"repos": ["owner/name"], "never_branches": ["release"]}]`. It never lets through a force
   push, a delete, tags, `--all`/`--mirror`, or a push to `main`, `master` or the branch the remote
-  calls its default (so `never_branches` only adds to that list). Every other push still asks
+  calls its default (so `never_branches` only adds to that list). A bare `git push` is judged by the
+  branch it tracks, and asks if that tracks another remote. Every other push still asks. It reads
+  plain command spellings only, so a push through a script or alias is not covered
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 

@@ -72,6 +72,8 @@ class Outward(unittest.TestCase):
                 if args[0] == "remote":
                     return True, url
                 if args[0] == "rev-parse":
+                    if "@{upstream}" in args:
+                        return False, ""
                     return True, branch + "\n"
                 if args[0] == "symbolic-ref":
                     return (True, default + "\n") if default else (False, "")
@@ -92,6 +94,21 @@ class Outward(unittest.TestCase):
         self.assertFalse(quiet("git push origin HEAD:main"))
         self.assertFalse(quiet("git push origin feature/x:refs/heads/main"))
         self.assertFalse(quiet("git push", reader(url, branch="main")))
+
+        def tracking(upstream, ok=True):
+            base = reader(url)
+
+            def read(folder, *args):
+                if "@{upstream}" in args:
+                    return (True, upstream + "\n") if ok else (False, "")
+                return base(folder, *args)
+
+            return read
+
+        self.assertTrue(quiet("git push", tracking("origin/feature/x")))
+        self.assertFalse(quiet("git push", tracking("origin/main")))
+        self.assertFalse(quiet("git push", tracking("fork/feature/x")))
+        self.assertTrue(quiet("git push", tracking("", ok=False)))
         self.assertFalse(
             quiet("git push", reader(url, branch="trunk", default="origin/trunk"))
         )
@@ -391,8 +408,35 @@ class Connector(unittest.TestCase):
         self.assertEqual(ask("mcp__x__send_message", "/work/other"), "ask")
         self.assertEqual(ask("mcp__x__send_message", "/work/application"), "ask")
         self.assertEqual(ask("mcp__x__send_message", ""), "ask")
+        self.assertEqual(ask("mcp__x__send_message", "work/app"), "ask")
         self.assertEqual(ask("mcp__y__send_message", "/work/app"), "ask")
         self.assertEqual(ask("mcp__x__delete_file", "/work/app"), "ask")
+
+    def test_quiet_tools_ignores_the_hook_process_folder_when_cwd_is_absent(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cfg = {
+                "quiet_tools": [{"tool": "mcp__x__send_message", "folders": [folder]}]
+            }
+            with tempfile.NamedTemporaryFile(
+                "w", suffix=".json", delete=False
+            ) as handle:
+                json.dump(cfg, handle)
+            done = subprocess.run(
+                [sys.executable, str(GUARDS / "connector_guard.py")],
+                input=json.dumps(
+                    {
+                        "tool_name": "mcp__x__send_message",
+                        "tool_input": {},
+                        "session_id": "nc",
+                    }
+                ),
+                capture_output=True,
+                text=True,
+                cwd=folder,  # the hook process runs inside the trusted folder, but the event names none
+                env={**os.environ, "SKILLKNOT_GUARDS_CONFIG": handle.name},
+                check=True,
+            )
+        self.assertIn('"ask"', done.stdout)
 
     def test_quiet_tools_still_asks_after_messages_were_read(self):
         cfg = {

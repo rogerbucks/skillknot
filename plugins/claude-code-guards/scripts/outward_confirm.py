@@ -207,7 +207,23 @@ def quiet_push(push, config, reader=git):
     if ok and default.strip():
         protected.add(default.strip().split("/", 1)[-1])
     targets = []
-    for spec in push["refspecs"] or [current]:
+    if not push["refspecs"]:
+        # A bare push goes where the branch tracks, not necessarily to its own name: use the upstream.
+        ok, upstream = reader(
+            push["dir"],
+            "rev-parse",
+            "--abbrev-ref",
+            "--symbolic-full-name",
+            "@{upstream}",
+        )
+        up = upstream.strip()
+        if ok and up.startswith(push["remote"] + "/"):
+            targets.append(up.split("/", 1)[1])
+        elif not ok:
+            targets.append(current)
+        else:
+            return False  # tracks another remote: ask
+    for spec in push["refspecs"]:
         dest = spec.split(":", 1)[-1] if ":" in spec else spec
         dest = dest.removeprefix("refs/heads/")
         targets.append(current if dest == "HEAD" else dest)
