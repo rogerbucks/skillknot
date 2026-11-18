@@ -39,13 +39,18 @@ def is_off(config, guard):
 def quiet_here(config, tool, cwd, home=None):
     """True when the overlay's "quiet_tools" lists this exact tool for the session's folder.
     Each entry is {"tool": exact tool name, "folders": [folder, ...]}. A folder may use `*` and
-    matches itself and anything under it. Opt-in per tool and per folder; nothing else is quieted."""
+    matches itself and anything under it. Opt-in per tool and per folder; nothing else is quieted.
+    A hook event with no `cwd` never matches: the hook process's own folder says nothing about the session."""
+    if not cwd or not str(cwd).startswith(("/", "~")):
+        return False
     for entry in config.get("quiet_tools", []):
         if not isinstance(entry, dict) or entry.get("tool") != tool:
             continue
-        here = expand(cwd or ".", os.getcwd(), home)
+        here = expand(str(cwd), "/", home)
         for folder in entry.get("folders", []):
-            pattern = expand(str(folder), os.getcwd(), home).rstrip("/")
+            if not str(folder).startswith(("/", "~")):
+                continue  # a relative folder has no fixed meaning here
+            pattern = expand(str(folder), "/", home).rstrip("/")
             if fnmatch.fnmatchcase(here, pattern) or fnmatch.fnmatchcase(
                 here, pattern + "/*"
             ):
