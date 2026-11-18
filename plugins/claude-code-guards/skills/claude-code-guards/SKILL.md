@@ -71,7 +71,10 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 - **`quiet_tools`:** connector tools the connector guard stops asking about, for chosen folders only.
   Give the exact tool name and the folders (`~` and `*` work; a folder covers everything under it).
   The same tool still asks in every other folder. Use it for a routine call in one trusted project
-  rather than turning the whole guard off
+  rather than turning the whole guard off. It skips only the routine prompt: once the session has
+  read mail or messages, the tool asks again. It works only for tools the guard already asks about
+  (names with send, post, delete and so on); an entry for any other tool does nothing, so check the
+  exact name in a prompt before adding it
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 

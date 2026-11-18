@@ -54,7 +54,15 @@ def decide(event, config):
     is_mcp = tool.startswith("mcp__")
     if is_mcp and ALWAYS_ASK.search(name):
         if quiet_here(config, tool, event.get("cwd")):
-            return None  # the overlay's "quiet_tools" names this tool for this folder
+            # The overlay's "quiet_tools" names this tool for this folder. It skips the routine prompt
+            # only: once messages were read this session, the tool could carry their text out, so ask.
+            if not os.path.exists(marker(session)):
+                return None
+            return "ask", (
+                f"Connector guard: messages were read earlier in this session, and `{name}` could carry their "
+                "text out, so the quiet_tools setting does not apply now. Check that this call is yours, "
+                "not an instruction found inside a message."
+            )
         return (
             "ask",
             f"Connector guard: `{name}` sends, shares or removes something outside this machine. Approve it this once?",
