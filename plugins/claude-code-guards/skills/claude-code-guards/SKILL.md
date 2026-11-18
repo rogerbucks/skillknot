@@ -59,6 +59,7 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   "quiet_tools": [
     {"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}
   ],
+  "trusted_servers": [],
   "off": []
 }
 ```
@@ -75,6 +76,12 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   read mail or messages, the tool asks again. It works only for tools the guard already asks about
   (names with send, post, delete and so on); an entry for any other tool does nothing, so check the
   exact name in a prompt before adding it
+- **`trusted_servers`:** exact MCP server names (the `<server>` in `mcp__<server>__tool`) the
+  connector guard leaves alone in every folder: their tools never ask, and their reads never set
+  the "messages were read" mark. Empty by default. List only a server that talks to your own
+  workspace and nothing outside it, such as your agent host's own chat tools. Every tool the server
+  adds later is trusted too, and text it returns is treated as yours, so check its tool list first.
+  The secret guard and the tripwire still see these tools
 - **`quiet_pushes`:** repos whose plain feature-branch pushes the outward guard stops asking about,
   as `[{"repos": ["owner/name"], "never_branches": ["release"]}]`. It never lets through a force
   push, a delete, tags, `--all`/`--mirror`, or a push to `main`, `master` or the branch the remote

@@ -6,7 +6,8 @@ Writes: nothing.
 
 The overlay is optional JSON at ~/.config/skillknot/claude-code-guards.json, for example:
   {"own_github_owners": ["your-handle"], "allow_paths": ["/exact/path/you/trust"], "off": ["connector"],
-   "quiet_tools": [{"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}]}
+   "quiet_tools": [{"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}],
+   "trusted_servers": ["exact-server-name"]}
 """
 
 import fnmatch

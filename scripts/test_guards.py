@@ -464,6 +464,33 @@ class Connector(unittest.TestCase):
             if os.path.exists(marker):
                 os.unlink(marker)
 
+    def test_trusted_servers_never_ask_or_mark(self):
+        session = f"trusted-{os.getpid()}"
+        marker = connector_guard.marker(session)
+        call = lambda tool, cfg=None: hook(
+            "connector_guard.py",
+            {"tool_name": tool, "tool_input": {}, "session_id": session},
+            cfg,
+        )
+        cfg = {"trusted_servers": ["host"]}
+        try:
+            self.assertEqual(call("mcp__host__post_message"), "ask")  # off by default
+            for tool in (
+                "mcp__host__post_message",
+                "mcp__host__read_thread",
+                "mcp__host__read_project_chat",
+            ):
+                self.assertIsNone(call(tool, cfg), tool)
+            self.assertFalse(os.path.exists(marker))
+            self.assertEqual(call("mcp__nothost__post_message", cfg), "ask")
+            self.assertEqual(call("mcp__host2__post_message", cfg), "ask")
+            self.assertIsNone(call("mcp__mail__search_email", cfg))  # a real read marks
+            self.assertIsNone(call("mcp__host__post_message", cfg))
+            self.assertEqual(call("WebFetch", cfg), "ask")
+        finally:
+            if os.path.exists(marker):
+                os.unlink(marker)
+
     def test_flow(self):
         session = f"test-{os.getpid()}"
         marker = connector_guard.marker(session)

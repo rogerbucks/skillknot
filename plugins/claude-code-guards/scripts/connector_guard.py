@@ -10,6 +10,10 @@ Writes: one empty marker file per session in the system temp folder, once untrus
 Why the second rule: a message can carry hidden instructions. This stops one from steering a read
 straight into a leak without a person seeing it. Turn it off with "off": ["connector"] in the overlay, or quiet one
 exact tool in chosen folders only with "quiet_tools" (see claude-code-guards/SKILL.md).
+
+A server the person names in the overlay's "trusted_servers" (exact names, none by default) is left
+alone: its tools never ask and its reads never set the mark. Use it for a server that only talks to
+the person's own workspace, such as the agent host's own chat tools.
 """
 
 import hashlib
@@ -42,6 +46,12 @@ def leaf(tool):
     return match.group(1) if match else tool
 
 
+def server(tool):
+    """The <server> in mcp__<server>__<tool>, or None."""
+    match = re.match(r"^mcp__(.+?)__.+$", tool)
+    return match.group(1) if match else None
+
+
 def marker(session_id):
     digest = hashlib.sha256((session_id or "none").encode()).hexdigest()[:16]
     return os.path.join(tempfile.gettempdir(), f"skillknot-connector-read-{digest}")
@@ -52,6 +62,13 @@ def decide(event, config):
     session = event.get("session_id", "")
     name = leaf(tool)
     is_mcp = tool.startswith("mcp__")
+    trusted = config.get("trusted_servers", [])
+    if (
+        is_mcp
+        and isinstance(trusted, list)
+        and server(tool) in {str(t) for t in trusted}
+    ):
+        return None
     if is_mcp and ALWAYS_ASK.search(name):
         if quiet_here(config, tool, event.get("cwd")):
             # The overlay's "quiet_tools" names this tool for this folder. It skips the routine prompt
