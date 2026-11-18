@@ -56,6 +56,9 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   "own_github_owners": ["your-github-handle", "your-org"],
   "allow_paths": ["/exact/path/to/a/file/you/trust"],
   "rebuildable": ["node_modules", "dist", "__pycache__"],
+  "quiet_tools": [
+    {"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}
+  ],
   "off": []
 }
 ```
@@ -65,6 +68,10 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 - **`allow_paths`:** exact paths the secret guard lets through. Use whole paths, not patterns
 - **`rebuildable`:** folder names a recursive delete may remove without a prompt, when it removes
   only those. Use them for folders a build makes again
+- **`quiet_tools`:** connector tools the connector guard stops asking about, for chosen folders only.
+  Give the exact tool name and the folders (`~` and `*` work; a folder covers everything under it).
+  The same tool still asks in every other folder. Use it for a routine call in one trusted project
+  rather than turning the whole guard off
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
 

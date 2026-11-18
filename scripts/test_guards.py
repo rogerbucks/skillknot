@@ -327,6 +327,29 @@ class Tripwire(unittest.TestCase):
 
 
 class Connector(unittest.TestCase):
+    def test_quiet_tools_only_for_named_tool_and_folder(self):
+        cfg = {
+            "quiet_tools": [
+                {
+                    "tool": "mcp__x__send_message",
+                    "folders": ["/work/app", "/work/app-wt-*"],
+                }
+            ]
+        }
+        ask = lambda tool, cwd: hook(
+            "connector_guard.py",
+            {"tool_name": tool, "tool_input": {}, "session_id": "q", "cwd": cwd},
+            cfg,
+        )
+        self.assertIsNone(ask("mcp__x__send_message", "/work/app"))
+        self.assertIsNone(ask("mcp__x__send_message", "/work/app/src"))
+        self.assertIsNone(ask("mcp__x__send_message", "/work/app-wt-abc"))
+        self.assertEqual(ask("mcp__x__send_message", "/work/other"), "ask")
+        self.assertEqual(ask("mcp__x__send_message", "/work/application"), "ask")
+        self.assertEqual(ask("mcp__x__send_message", ""), "ask")
+        self.assertEqual(ask("mcp__y__send_message", "/work/app"), "ask")
+        self.assertEqual(ask("mcp__x__delete_file", "/work/app"), "ask")
+
     def test_flow(self):
         session = f"test-{os.getpid()}"
         marker = connector_guard.marker(session)
