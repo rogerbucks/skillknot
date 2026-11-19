@@ -123,7 +123,11 @@ def segments(command, cwd, home=None):
             parts = parts[1:]
         if not parts:
             continue
-        if parts[0].rsplit("/", 1)[-1] in SHELLS and len(parts) > 2 and parts[1] == "-c":
+        if (
+            parts[0].rsplit("/", 1)[-1] in SHELLS
+            and len(parts) > 2
+            and parts[1] == "-c"
+        ):
             yield from segments(parts[2], here, home)
             continue
         if parts[0] == "cd" and len(parts) > 1:

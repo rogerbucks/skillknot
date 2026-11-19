@@ -266,7 +266,6 @@ class Secret(unittest.TestCase):
         )
         self.assertIsNone(hook("secret_guard.py", read, {"off": ["secret"]}))
 
-
     def test_credential_tools_only_in_command_position(self):
         """A tool name inside a quoted argument, a regex or a file name is not a call to it."""
         find = lambda c: secret_guard.command_findings(c, "/work")
