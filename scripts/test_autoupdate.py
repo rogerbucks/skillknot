@@ -11,11 +11,14 @@ LISTING = {
     "installed": [
         {"id": "chart-picker@skillknot"},
         {"id": "other@elsewhere"},
+        {"id": "claude-code-guards@skillknot"},
     ],
     "available": [
         {"pluginId": "chart-picker@skillknot", "marketplaceName": "skillknot"},
         {"pluginId": "gauntlet@skillknot", "marketplaceName": "skillknot"},
         {"pluginId": "stranger@elsewhere", "marketplaceName": "elsewhere"},
+        {"pluginId": "claude-code-guards@skillknot", "marketplaceName": "skillknot"},
+        {"pluginId": "planning-panel@skillknot", "marketplaceName": "skillknot"},
     ],
 }
 
@@ -41,9 +44,17 @@ class FakeRunner:
 
 class PlanTest(unittest.TestCase):
     def test_installs_missing_and_updates_installed_only_for_skillknot(self):
-        to_install, to_update = autoupdate.plan(LISTING)
+        to_install, to_update, skipped = autoupdate.plan(LISTING)
         self.assertEqual(to_install, ["gauntlet@skillknot"])
         self.assertEqual(to_update, ["chart-picker@skillknot"])
+        self.assertEqual(
+            skipped, ["claude-code-guards@skillknot", "planning-panel@skillknot"]
+        )
+
+    def test_hook_plugins_lists_every_plugin_with_hooks(self):
+        plugins = Path(__file__).resolve().parent.parent / "plugins"
+        with_hooks = {p.parent.name for p in plugins.glob("*/hooks")}
+        self.assertLessEqual(with_hooks, set(autoupdate.HOOK_PLUGINS))
 
 
 class CheckAndUpdateTest(unittest.TestCase):
@@ -65,6 +76,8 @@ class CheckAndUpdateTest(unittest.TestCase):
         self.assertIn("claude plugin install gauntlet@skillknot", commands)
         self.assertIn("claude plugin update chart-picker@skillknot", commands)
         self.assertFalse(any("elsewhere" in c for c in commands))
+        self.assertFalse(any("claude-code-guards" in c for c in commands))
+        self.assertFalse(any("planning-panel" in c for c in commands))
         again = FakeRunner()
         self.assertEqual(self.go(again), 0)
         self.assertEqual(len(again.calls), 1)
