@@ -11,6 +11,9 @@ updates every installed skillknot plugin and installs any skillknot plugin that 
 yet. It only runs `claude plugin` commands for the skillknot marketplace, so other plugins,
 marketplaces and settings stay as they are.
 
+Plugins with hooks (HOOK_PLUGINS) are never installed or updated here. Hooks can stop or steer
+every session, so a person takes those changes by hand with `claude plugin update`.
+
 --install-launchd (macOS) runs it at login and every 15 minutes. The job runs a copy of this file,
 not the repo's, so a later push never changes what runs on the machine without a person copying it.
 """
@@ -33,6 +36,10 @@ LOG_LINES = 500
 STATE = Path.home() / ".local" / "state" / "skillknot"
 SHARE = Path.home() / ".local" / "share" / "skillknot"
 AGENT_FILE = Path.home() / "Library" / "LaunchAgents" / f"{LABEL}.plist"
+# Every plugin here with a hooks folder. scripts/test_autoupdate.py fails if one is missing.
+HOOK_PLUGINS = frozenset(
+    {"claude-code-guards", "claude-code-session-meter", "planning-panel"}
+)
 
 
 def run(command, timeout=300):
@@ -75,20 +82,28 @@ def has_marketplace(runner=run):
     return any(entry.get("name") == MARKETPLACE for entry in entries or [])
 
 
+def held(plugin_id):
+    """True for a plugin with hooks, which a person installs and updates by hand."""
+    return plugin_id.rsplit("@", 1)[0] in HOOK_PLUGINS
+
+
 def plan(listing):
-    """Turns `claude plugin list --available --json` into (to install, to update)."""
+    """Turns `claude plugin list --available --json` into (to install, to update, held)."""
     suffix = f"@{MARKETPLACE}"
     installed = {
         entry["id"]
         for entry in listing.get("installed", [])
         if entry.get("id", "").endswith(suffix)
     }
-    available = sorted(
+    available = {
         entry["pluginId"]
         for entry in listing.get("available", [])
         if entry.get("marketplaceName") == MARKETPLACE and "pluginId" in entry
-    )
-    return [p for p in available if p not in installed], sorted(installed)
+    }
+    to_install = sorted(p for p in available - installed if not held(p))
+    to_update = sorted(p for p in installed if not held(p))
+    skipped = sorted(p for p in available | installed if held(p))
+    return to_install, to_update, skipped
 
 
 def update(runner=run, log=print):
@@ -108,7 +123,7 @@ def update(runner=run, log=print):
     if not isinstance(listing, dict):
         log("could not read the plugin list")
         return False
-    to_install, to_update = plan(listing)
+    to_install, to_update, skipped = plan(listing)
     failed = []
     for action, plugins in (("install", to_install), ("update", to_update)):
         for plugin in plugins:
@@ -118,7 +133,7 @@ def update(runner=run, log=print):
                 log(f"{action} {plugin} failed: {out[-300:]}")
     log(
         f"installed {len(to_install)}, checked {len(to_update)} for updates, "
-        f"{len(failed)} failed"
+        f"{len(failed)} failed, held {len(skipped)} hook plugins for a manual update"
     )
     return True
 
