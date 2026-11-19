@@ -74,14 +74,15 @@ python3 scripts/autoupdate.py --install-launchd
 
 It adds a background job that runs at login and every 15 minutes. Each run asks GitHub for the
 newest commit on `main` and stops if nothing changed. When `main` has moved, it refreshes the
-skillknot marketplace, updates every skillknot plugin and installs **every skillknot plugin you do not
-have yet**, including new ones, with no prompt. Turn it on only if you want the whole set. It only
-touches skillknot plugins. A restart of Claude Code picks up the changes.
+skillknot marketplace, updates your skillknot plugins and installs **every skillknot plugin you do
+not have yet**, including new ones, with no prompt, except the hook plugins below. Turn it on only
+if you want the whole set. It only touches skillknot plugins. A restart of Claude Code picks up the
+changes.
 
-**Plugins with hooks are left alone:** `claude-code-guards`, `claude-code-session-meter` and
-`planning-panel`. Hooks run on every tool call, so a change to one should not reach your machine
-unseen. Install or update those yourself, for example
-`claude plugin update claude-code-guards@skillknot`. The log counts them as held.
+**Plugins with hooks are left alone:** `claude-code-guards` and `claude-code-session-meter`. Hooks
+run on every tool call, so a change to one should not reach your machine unseen. Install or update
+those yourself, for example `claude plugin update claude-code-guards@skillknot`. The log counts
+them as held.
 
 The job runs its own copy of the script, from `~/.local/share/skillknot`, so a later push never
 changes what runs on your Mac until you run the install command again. The log is
