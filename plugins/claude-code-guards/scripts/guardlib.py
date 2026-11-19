@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 OVERLAY = Path.home() / ".config" / "skillknot" / "claude-code-guards.json"
-SEPARATORS = re.compile(r"&&|\|\||[;|\n]")
+SHELLS = {"sh", "bash", "zsh", "dash"}
 
 
 def load_config(path=None):
@@ -59,6 +59,43 @@ def quiet_here(config, tool, cwd, home=None):
     return False
 
 
+def split_commands(command):
+    """Splits a command line at `;`, `|`, `||`, `&&`, `&` and newlines, but only outside quotes,
+    so a separator inside a quoted argument such as grep -E "(a|b)" stays part of that argument.
+    The `&` in a redirection such as 2>&1 or &> is not a separator."""
+    text = command or ""
+    parts, current, quote, i = [], [], None, 0
+    while i < len(text):
+        char = text[i]
+        if quote:
+            current.append(char)
+            if char == quote:
+                quote = None
+            elif char == "\\" and quote == '"' and i + 1 < len(text):
+                current.append(text[i + 1])
+                i += 1
+        elif char == "\\" and i + 1 < len(text):
+            current += [char, text[i + 1]]
+            i += 1
+        elif char in "'\"":
+            quote = char
+            current.append(char)
+        elif char in ";|\n" or (
+            char == "&"
+            and (i == 0 or text[i - 1] not in "<>")
+            and text[i + 1 : i + 2] != ">"
+        ):
+            parts.append("".join(current))
+            current = []
+            if text[i + 1 : i + 2] == char:  # && or ||
+                i += 1
+        else:
+            current.append(char)
+        i += 1
+    parts.append("".join(current))
+    return parts
+
+
 def words(segment):
     """Shell words of one command segment, without redirections. Falls back to a plain split."""
     try:
@@ -76,13 +113,18 @@ def expand(path, cwd, home=None):
 
 def segments(command, cwd, home=None):
     """Yields (words, cwd) for each simple command, following `cd` so later segments know their folder.
-    Leading VAR=value assignments are dropped. Best effort: it reads the obvious spellings only."""
+    Leading VAR=value assignments are dropped. Best effort: it reads the obvious spellings only.
+    A `sh -c "..."` (or bash, zsh, dash) is read as the commands inside it.
+    Words inside quotes, regexes and file names are arguments, never commands."""
     here = cwd
-    for segment in SEPARATORS.split(command or ""):
+    for segment in split_commands(command):
         parts = words(segment)
         while parts and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", parts[0]):
             parts = parts[1:]
         if not parts:
+            continue
+        if parts[0].rsplit("/", 1)[-1] in SHELLS and len(parts) > 2 and parts[1] == "-c":
+            yield from segments(parts[2], here, home)
             continue
         if parts[0] == "cd" and len(parts) > 1:
             here = expand(parts[1], here, home)
