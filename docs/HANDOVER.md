@@ -28,14 +28,15 @@ throughout. This file holds the reasoning that the code cannot.
   owner plans (goal, audience, limits, open questions, next steps). Claude fills it through the
   mod's `update_plan` tool; `design-brief` and `slide-storyline` point at it. The skill alone keeps
   the same plan in the chat, so it works without mods
-- **The gate:** pull requests only, rebase merges only, and `checks`, `lint` and `review` must
-  pass. Links are checked locally, not in CI: `python3 scripts/links.py`
+- **The gate:** pull requests only, and `checks` and `lint` must pass. Rebase merges by default;
+  squash is allowed by hand for a branch that holds merge commits, which a rebase cannot replay.
+  Links are checked locally, not in CI: `python3 scripts/links.py`
 - **Automatic review and merge:** `review.yml` has an automated reviewer read each pull request
-  against AGENTS.md, post one comment, and fail on a BLOCK verdict. `auto-merge.yml` turns on
+  against AGENTS.md and post one comment. It is advice only: a BLOCK or missing verdict shows as a
+  warning and never stops a merge, so read the comment before merging. `auto-merge.yml` turns on
   rebase auto-merge for the owner's own non-draft pull requests. A merge made by the workflow token
   does not start the `push` run of CI on `main`, so `main` is checked only through its pull
-  requests. A pull request that changes `review.yml` cannot pass `review`, so the owner merges it
-  by hand
+  requests. The reviewer skips a pull request that changes `review.yml`, so check those by eye
 
 ## Do this first
 
