@@ -28,7 +28,7 @@ Ask only what you cannot infer. Offer a guess with each, so the user can answer 
 | **What should they do or think after the last slide?** | This is the deck's whole job. Without it, every slide is optional |
 | **How long, and will it be presented or read?** | A read deck needs full-sentence headlines and no speaker. A spoken deck can lean on the speaker |
 
-If a planning panel is available (the `planning-panel` skill or its pane), keep the answers
+If a planning panel is available (a plan pane or plan tool in your agent), keep the answers
 there: who decides as the audience, what they should do as the goal, length and format as limits.
 
 ## 2. Put the answer first
