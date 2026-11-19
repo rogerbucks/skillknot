@@ -267,6 +267,34 @@ class Secret(unittest.TestCase):
         self.assertIsNone(hook("secret_guard.py", read, {"off": ["secret"]}))
 
 
+    def test_credential_tools_only_in_command_position(self):
+        """A tool name inside a quoted argument, a regex or a file name is not a call to it."""
+        find = lambda c: secret_guard.command_findings(c, "/work")
+        for good in (
+            'cd /x/failed && grep -nE "^x (tests|pass|fail) " a.log | head; grep -n "b" a.log',
+            "grep -E 'op|vault' notes.md",
+            'echo "done; pass" && ls',
+            "rg 'bw|lpass|gopass' src",
+            "cat pass.txt | wc -l",
+            "ls ./pass/ op/",
+            "make test 2>&1 | tee out.log",
+            "npm test &> out.log",
+        ):
+            self.assertFalse(find(good), good)
+        for bad in (
+            "pass show email/work",
+            "ls && pass show x",
+            "echo hi | /usr/bin/pass show x",
+            "true; op read op://vault/item",
+            "sleep 1 & gopass show x",
+            "FOO=1 bw get password x",
+            'grep "a|b" f || vault kv get secret/x',
+            'bash -c "cd /tmp; pass show x"',
+            "security find-generic-password -s x",
+        ):
+            self.assertTrue(find(bad), bad)
+
+
 class Destructive(unittest.TestCase):
     def test_finds_risks(self):
         find = lambda c, r=(): destructive_guard.risks(c, "/work", r)
