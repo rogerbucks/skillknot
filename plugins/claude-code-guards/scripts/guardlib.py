@@ -39,8 +39,8 @@ def is_off(config, guard):
 
 def quiet_here(config, tool, cwd, home=None):
     """True when the overlay's "quiet_tools" lists this exact tool for the session's folder.
-    Each entry is {"tool": exact tool name, "folders": [folder, ...]}. A folder may use `*` and
-    matches itself and anything under it. Opt-in per tool and per folder; nothing else is quieted.
+    Each entry is {"tool": exact tool name, "folders": [folder, ...], "exact_folders": [folder, ...]}.
+    A folder may use `*` and matches itself and anything under it; an exact folder matches only itself. Opt-in per tool and per folder; nothing else is quieted.
     A hook event with no `cwd` never matches: the hook process's own folder says nothing about the session."""
     if not cwd or not str(cwd).startswith(("/", "~")):
         return False
@@ -56,6 +56,12 @@ def quiet_here(config, tool, cwd, home=None):
                 here, pattern + "/*"
             ):
                 return True
+        for folder in entry.get("exact_folders", []):
+            if not str(folder).startswith(("/", "~")):
+                continue
+            pattern = expand(str(folder), "/", home).rstrip("/")
+            if fnmatch.fnmatchcase(here.rstrip("/"), pattern):
+                return True  # this folder only, never what is under it
     return False
 
 

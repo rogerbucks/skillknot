@@ -71,7 +71,8 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   only those. Use them for folders a build makes again
 - **`quiet_tools`:** connector tools the connector guard stops asking about, for chosen folders only.
   Give the exact tool name and the folders (`~` and `*` work; a folder covers everything under it).
-  The same tool still asks in every other folder. Use it for a routine call in one trusted project
+  An entry may also list `exact_folders`, which match only that folder and nothing under it (for a
+  session that sits in a parent folder). The same tool still asks in every other folder. Use it for a routine call in one trusted project
   rather than turning the whole guard off. It skips only the routine prompt: once the session has
   read mail or messages, the tool asks again. It works only for tools the guard already asks about
   (names with send, post, delete and so on); an entry for any other tool does nothing, so check the

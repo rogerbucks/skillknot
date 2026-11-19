@@ -439,6 +439,29 @@ class Connector(unittest.TestCase):
         self.assertEqual(ask("mcp__y__send_message", "/work/app"), "ask")
         self.assertEqual(ask("mcp__x__delete_file", "/work/app"), "ask")
 
+    def test_quiet_tools_exact_folder_matches_only_itself(self):
+        cfg = {
+            "quiet_tools": [
+                {"tool": "mcp__x__send_message", "exact_folders": ["/work"]}
+            ]
+        }
+        ask = lambda cwd: hook(
+            "connector_guard.py",
+            {
+                "tool_name": "mcp__x__send_message",
+                "tool_input": {},
+                "session_id": "ex",
+                "cwd": cwd,
+            },
+            cfg,
+        )
+        self.assertIsNone(ask("/work"))
+        self.assertIsNone(ask("/work/"))
+        self.assertEqual(ask("/work/other"), "ask")
+        self.assertEqual(ask("/work2"), "ask")
+        self.assertEqual(ask(""), "ask")
+        self.assertEqual(ask("work"), "ask")
+
     def test_quiet_tools_ignores_the_hook_process_folder_when_cwd_is_absent(self):
         with tempfile.TemporaryDirectory() as folder:
             cfg = {
