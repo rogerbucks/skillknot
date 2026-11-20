@@ -130,7 +130,8 @@ before each commit and the same check before each push.
 
 Skills here stay vendor neutral, with one folder per skill. Each skill declares what it needs in
 `compatibility`, and any model names go in its `references/models.md`. A skill that truly works
-with one vendor says so in its name.
+with one vendor says so in its name. A subagent may name its model on its own `model:` line, and
+nowhere else.
 
 ## Licence
 

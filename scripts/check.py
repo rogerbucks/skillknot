@@ -200,6 +200,29 @@ def check_skill(path):
     return findings
 
 
+def check_agent(path):
+    """A subagent may name its model only on its own `model:` line, the one place a tool needs it."""
+    where = str(path)
+    text = path.read_text(encoding="utf-8")
+    fields = frontmatter(text)
+    if fields is None:
+        return [f"{where}: no frontmatter"]
+    findings = []
+    if fields.get("name") != path.stem:
+        findings.append(f"{where}: name differs from its file")
+    if not 1 <= len(fields.get("description", "")) <= MAX_DESCRIPTION:
+        findings.append(
+            f"{where}: description missing or over {MAX_DESCRIPTION} characters"
+        )
+    rest = re.sub(r"^model:.*$", "", text, count=1, flags=re.MULTILINE)
+    if MODEL_NAME.search(rest):
+        findings.append(
+            f"{where}: a vendor's model name outside its model field,"
+            " which belongs in references/models.md"
+        )
+    return findings
+
+
 def check_format(root):
     entries = json.loads(
         (root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8")
@@ -225,6 +248,8 @@ def check_format(root):
             != plugin.name
         ):
             findings.append(f"{plugin.name}: plugin.json name differs from its folder")
+        for agent in sorted((plugin / "agents").glob("*.md")):
+            findings += check_agent(agent)
         skills = sorted((plugin / "skills").glob("*/SKILL.md"))
         if not skills:
             findings.append(f"{plugin.name}: no skill")

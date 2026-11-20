@@ -14,6 +14,10 @@ import check
 
 GOOD_SKILL = "---\nname: demo\ndescription: Use when testing.\ncompatibility: Any agent.\n---\n\n# demo\n\nSee [briefs](references/briefs.md).\n"
 
+GOOD_AGENT = (
+    "---\nname: scout\ndescription: Use when testing.\nmodel: haiku\n---\n\n# scout\n"
+)
+
 
 def write(root, relative, text):
     path = root / relative
@@ -119,6 +123,21 @@ class SkillTests(unittest.TestCase):
     def test_empty_marketplace_passes(self):
         write(self.root, ".claude-plugin/marketplace.json", json.dumps({"plugins": []}))
         self.assertEqual(check.check_format(self.root), [])
+
+    def test_agent_may_name_its_model_in_its_model_field(self):
+        make_repo(self.root)
+        write(self.root, "plugins/demo/agents/scout.md", GOOD_AGENT)
+        self.assertEqual(check.check_format(self.root), [])
+
+    def test_agent_naming_a_model_elsewhere_fails(self):
+        make_repo(self.root)
+        write(self.root, "plugins/demo/agents/scout.md", GOOD_AGENT + "Runs on opus.\n")
+        self.assertTrue(check.check_format(self.root))
+
+    def test_agent_name_must_match_file(self):
+        make_repo(self.root)
+        write(self.root, "plugins/demo/agents/other.md", GOOD_AGENT)
+        self.assertTrue(check.check_format(self.root))
 
     def test_name_must_match_folder(self):
         make_repo(self.root, GOOD_SKILL.replace("name: demo", "name: other"))
