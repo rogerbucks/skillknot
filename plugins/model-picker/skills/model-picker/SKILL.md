@@ -2,7 +2,7 @@
 name: model-picker
 description: Use when the user asks which AI model or effort level to use, wants to cut AI spend or speed things up, is setting up subagents, automations or batch jobs, or a task is being run on a bigger model than it needs. Sorts the work into tiers by what it needs, picks the cheapest tier that does it well, tests that choice on a sample, and reports the expected saving.
 license: MIT
-compatibility: Works with any agent and any vendor. Model names live only in references/models.md. Prices change often, so it reads current prices from the vendor's page or asks; it never relies on remembered prices.
+compatibility: Works with any agent and any vendor. Model names live only in references/models.md. Prices change often, so it reads current prices from the vendor's page or asks; it never relies on remembered prices. Its three tier-pinned subagents (scout, builder, reviewer) run in Claude Code only.
 ---
 
 # model-picker: the cheapest model that does the job well
@@ -79,6 +79,20 @@ now routed to mid by keyword.
   remembered price is a guess
 - **Show the arithmetic:** volume times price per tier, before and after
 - **Say the confidence** and what would change the answer
+
+## Delegate to an agent pinned to the tier
+
+Where the tool runs subagents, a subagent on a tier is the easiest way to keep each step there.
+This plugin ships three for Claude Code, each pinned to one tier:
+
+- **`scout`, fast tier, read-only:** finds files, searches code, logs and docs, and reports
+  findings with paths
+- **`builder`, mid tier:** makes a routine change in one area, then runs the project's tests
+- **`reviewer`, strongest tier, read-only:** reviews a diff, plan or decision hard and reports
+  findings ranked by severity
+
+A model named on the delegation call beats the agent's own tier, and the agent's tier beats any
+default subagent model in the settings. Script-tier steps need no agent.
 
 ## Map tiers to real models
 
