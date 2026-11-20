@@ -134,6 +134,15 @@ class SkillTests(unittest.TestCase):
         write(self.root, "plugins/demo/agents/scout.md", GOOD_AGENT + "Runs on opus.\n")
         self.assertTrue(check.check_format(self.root))
 
+    def test_agent_model_line_in_the_body_is_still_scanned(self):
+        make_repo(self.root)
+        write(
+            self.root,
+            "plugins/demo/agents/scout.md",
+            GOOD_AGENT.replace("model: haiku\n", "") + "model: opus\n",
+        )
+        self.assertTrue(check.check_format(self.root))
+
     def test_agent_name_must_match_file(self):
         make_repo(self.root)
         write(self.root, "plugins/demo/agents/other.md", GOOD_AGENT)
