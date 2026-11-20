@@ -60,7 +60,8 @@ so you can install only the ones you want.
 - **`capability-ladder`:** when a capability is missing, check what exists, pick the cheapest
   fix, and propose before installing anything
 - **`model-picker`:** match each step of a job to the cheapest AI model tier and effort that does
-  it well, test that on a sample, and report the saving. Vendor neutral
+  it well, test that on a sample, and report the saving. Vendor neutral, with three Claude Code
+  subagents pinned to a tier each: a read-only `scout`, a `builder` and a read-only `reviewer`
 - **`context-budget`:** measure always-loaded context and hook latency against budgets, and fix a
   breach by moving material, not deleting it
 - **`claude-code-guards`:** Claude Code hooks that ask before pushes, destructive commands and
