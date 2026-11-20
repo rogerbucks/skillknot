@@ -24,13 +24,13 @@ throughout. This file holds the reasoning that the code cannot.
   agent orders. `claude-code-session-meter` adds a status line, a cost, time and prompt cap, and a
   handoff reminder
 - **One app:** `obsidian-canvas`
-- **The gate:** pull requests only, and `checks` and `lint` must pass. Rebase merges by default;
-  squash is allowed by hand for a branch that holds merge commits, which a rebase cannot replay.
+- **The gate:** pull requests only, and `checks` and `lint` must pass. Merge commits only, so each
+  pull request stays one group in the history and can be undone in one step.
   Links are checked locally, not in CI: `python3 scripts/links.py`
 - **Automatic review and merge:** `review.yml` has an automated reviewer read each pull request
   against AGENTS.md and post one comment. It is advice only: a BLOCK or missing verdict shows as a
   warning and never stops a merge, so read the comment before merging. `auto-merge.yml` turns on
-  rebase auto-merge for the owner's own non-draft pull requests. A merge made by the workflow token
+  merge-commit auto-merge for the owner's own non-draft pull requests. A merge made by the workflow token
   does not start the `push` run of CI on `main`, so `main` is checked only through its pull
   requests. The reviewer skips a pull request that changes `review.yml`, so check those by eye
 
@@ -110,7 +110,7 @@ automated review, but none has run in a real session yet.
   would duplicate skills and let them drift
 - **CI only reads.** Fix-ups run on the author's machine through `tidy.py`, so nothing pushes to
   `main` by itself
-- **Committer names are not checked.** GitHub writes the owner's display name on rebase merges, and
+- **Committer names are not checked.** GitHub writes the owner's display name on the merges it makes, and
   the owner chose to keep it. Author names, emails and messages are still checked
 - **CI checks out the pull request's head commit,** because GitHub's temporary merge commit carries
   the display name and would fail the check
