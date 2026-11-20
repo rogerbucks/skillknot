@@ -214,7 +214,8 @@ def check_agent(path):
         findings.append(
             f"{where}: description missing or over {MAX_DESCRIPTION} characters"
         )
-    rest = re.sub(r"^model:.*$", "", text, count=1, flags=re.MULTILINE)
+    head, body = re.match(r"(---\n.*?\n---\n)(.*)", text, re.DOTALL).groups()
+    rest = re.sub(r"^model:.*$", "", head, count=1, flags=re.MULTILINE) + body
     if MODEL_NAME.search(rest):
         findings.append(
             f"{where}: a vendor's model name outside its model field,"
