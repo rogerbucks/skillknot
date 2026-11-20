@@ -1,6 +1,6 @@
 name: Auto-merge
 
-# Turns on GitHub auto-merge (rebase) for the owner's own, non-draft pull requests from this repo.
+# Turns on GitHub auto-merge (merge commit) for the owner's own, non-draft pull requests from this repo.
 # GitHub then merges only once every required check in the main ruleset has passed. Fork and
 # draft pull requests are left for a person.
 on:
@@ -24,4 +24,4 @@ jobs:
       - env:
           GH_TOKEN: ${{ github.token }}
           PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr merge --auto --rebase "$PR_URL"
+        run: gh pr merge --auto --merge "$PR_URL"
