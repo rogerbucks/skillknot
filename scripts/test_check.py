@@ -363,5 +363,16 @@ class HistoryTests(unittest.TestCase):
         self.assertTrue(check.check_history(self.root, ["acme"]))
 
 
+class HookMatchesCI(unittest.TestCase):
+    def test_pre_push_ruff_version_matches_ci(self):
+        import re
+
+        root = Path(__file__).resolve().parent.parent
+        hook = (root / ".githooks" / "pre-push").read_text(encoding="utf-8")
+        ci = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        pinned = re.search(r"^RUFF_VERSION=(\S+)$", hook, re.MULTILINE).group(1)
+        self.assertEqual(set(re.findall(r"ruff==(\S+)", ci)), {pinned})
+
+
 if __name__ == "__main__":
     unittest.main()

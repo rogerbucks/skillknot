@@ -102,13 +102,45 @@ def split_commands(command):
     return parts
 
 
+def attach_redirect_targets(segment):
+    """Joins each unquoted redirection to its target, so `> out.log` becomes `>out.log` and is
+    dropped as one word. Quoted text is left alone, so an argument such as '>' never hides the
+    word after it. A closed descriptor (`>&-`) takes no target."""
+    out, quote, i = [], None, 0
+    while i < len(segment):
+        char = segment[i]
+        out.append(char)
+        if quote:
+            if char == quote:
+                quote = None
+            elif char == "\\" and quote == '"' and i + 1 < len(segment):
+                out.append(segment[i + 1])
+                i += 1
+        elif char == "\\" and i + 1 < len(segment):
+            out.append(segment[i + 1])
+            i += 1
+        elif char in "'\"":
+            quote = char
+        elif char in "<>":
+            while i + 1 < len(segment) and segment[i + 1] in "<>&|-":
+                i += 1
+                out.append(segment[i])
+            if out[-1] != "-" or out[-2:-1] == ["<"]:  # `<<- EOF` still takes one
+                while i + 1 < len(segment) and segment[i + 1] in " \t":
+                    i += 1
+        i += 1
+    return "".join(out)
+
+
 def words(segment):
-    """Shell words of one command segment, without redirections. Falls back to a plain split."""
+    """Shell words of one command segment, without redirections or their targets, so the file
+    in `git push > out.log` is not read as an argument. Falls back to a plain split."""
+    joined = attach_redirect_targets(segment)
     try:
-        parts = shlex.split(segment, comments=False)
+        parts = shlex.split(joined, comments=False)
     except ValueError:
-        parts = segment.split()
-    return [w for w in parts if not re.match(r"^\d*[<>]", w)]
+        parts = joined.split()
+    return [w for w in parts if not re.match(r"^(?:\d*|&)[<>]", w)]
 
 
 def expand(path, cwd, home=None):
