@@ -1,3 +1,21 @@
 #!/bin/sh
 # Stops a push that would fail CI. Turn it on once per clone: git config core.hooksPath .githooks
-exec python3 "$(git rev-parse --show-toplevel)/scripts/check.py" --history --require-terms
+# Runs the leak check, then the same ruff version CI's lint job runs, through uvx or pipx.
+set -e
+top="$(git rev-parse --show-toplevel)"
+RUFF_VERSION=0.17.3
+
+python3 "$top/scripts/check.py" --history --require-terms
+
+if command -v uvx >/dev/null 2>&1; then
+  ruff() { uvx "ruff@$RUFF_VERSION" "$@"; }
+elif command -v pipx >/dev/null 2>&1; then
+  ruff() { pipx run "ruff==$RUFF_VERSION" "$@"; }
+else
+  echo "pre-push: ruff $RUFF_VERSION is needed to match CI; install uv or pipx, then push again." >&2
+  exit 1
+fi
+
+cd "$top"
+ruff check scripts plugins
+ruff format --check scripts plugins
