@@ -324,7 +324,9 @@ class Secret(unittest.TestCase):
         """The secret guard's decision on one Bash command, with an optional allow_paths list."""
         event = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": cwd}
         return hook(
-            "secret_guard.py", event, {"allow_paths": allow} if allow is not None else None
+            "secret_guard.py",
+            event,
+            {"allow_paths": allow} if allow is not None else None,
         )
 
     def test_prose_and_regex_are_not_one_path(self):
@@ -374,18 +376,24 @@ class Secret(unittest.TestCase):
         """An absolute entry matches only exactly, a relative entry never excuses a secret folder
         above it, and an entry covers that one path, not what sits under it."""
         self.assertEqual(
-            self.bash("cat /work/other/src/SecretsPanel/view.tsx", ["/work/repo/src/SecretsPanel/view.tsx"]),
+            self.bash(
+                "cat /work/other/src/SecretsPanel/view.tsx",
+                ["/work/repo/src/SecretsPanel/view.tsx"],
+            ),
             "deny",
         )
-        self.assertEqual(self.bash("cat ~/secrets/tests/a.txt", ["tests/a.txt"]), "deny")
+        self.assertEqual(
+            self.bash("cat ~/secrets/tests/a.txt", ["tests/a.txt"]), "deny"
+        )
         self.assertEqual(self.bash("cat ~/.ssh/src/a.pem", ["src/a.pem"]), "deny")
         self.assertEqual(
-            self.bash("cat src/SecretsPanel/view.tsx/../../../.env", ["src/SecretsPanel/view.tsx"]),
+            self.bash(
+                "cat src/SecretsPanel/view.tsx/../../../.env",
+                ["src/SecretsPanel/view.tsx"],
+            ),
             "deny",
         )
-        self.assertEqual(
-            self.bash("ls ./secret-store/inner/", ["secret-store"]), "ask"
-        )
+        self.assertEqual(self.bash("ls ./secret-store/inner/", ["secret-store"]), "ask")
 
     def test_real_protections_unchanged(self):
         for command, decision in (
@@ -407,7 +415,11 @@ class Secret(unittest.TestCase):
             ("python3 run.py --key=./certs/server.pem", "ask"),
         ):
             self.assertEqual(self.bash(command), decision, command)
-            self.assertEqual(self.bash(command, ["src/components/SecretsPanel.tsx"]), decision, command)
+            self.assertEqual(
+                self.bash(command, ["src/components/SecretsPanel.tsx"]),
+                decision,
+                command,
+            )
         self.assertIsNone(self.bash("cat .env.example"))
 
     def test_splitting_never_opens_a_secret_folder(self):
@@ -447,7 +459,9 @@ class Secret(unittest.TestCase):
         self.assertEqual(self.bash("cat /a/secret+x+/id", ["x"]), "deny")
         self.assertEqual(self.bash("cat /a/secret+b/x+/id", ["b/x"]), "deny")
         read = {"tool_name": "Read", "tool_input": {"file_path": "/etc/app/.env"}}
-        self.assertEqual(hook("secret_guard.py", read, {"allow_paths": [".env"]}), "deny")
+        self.assertEqual(
+            hook("secret_guard.py", read, {"allow_paths": [".env"]}), "deny"
+        )
         spaced = "/data/My Secrets/a.md"
         self.assertIsNone(self.bash(f'cat "{spaced}"', [spaced]))
 
