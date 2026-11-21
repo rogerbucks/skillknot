@@ -64,6 +64,31 @@ class Outward(unittest.TestCase):
         self.assertEqual(find('cd "$HOME/x" && git push')[0]["dir"], "/srv/me/x")
         self.assertEqual(len(find("git push && git push origin main")), 2)
 
+    def test_redirect_targets_are_not_remotes(self):
+        find = lambda c: outward_confirm.pushes_in(c, "/work", "/srv/me")
+        for command in (
+            "git push > /tmp/push.log 2>&1",
+            "git push >> /tmp/push.log",
+            "git push 2> /tmp/err.log",
+            "git push &> /tmp/push.log",
+            "git push >& /tmp/push.log",
+            "git push < /dev/null",
+            "git push >/tmp/push.log 2>&1",
+        ):
+            with self.subTest(command=command):
+                push = find(command)[0]
+                self.assertEqual(push["remote"], "origin")
+                self.assertEqual(push["refspecs"], [])
+        push = find("git push upstream feature/x > /tmp/push.log 2>&1")[0]
+        self.assertEqual((push["remote"], push["refspecs"]), ("upstream", ["feature/x"]))
+        self.assertEqual(find("git push >&- upstream")[0]["remote"], "upstream")
+
+    def test_quoted_redirect_does_not_hide_the_next_word(self):
+        import guardlib
+
+        self.assertEqual(guardlib.words("rm '>' /data"), ["rm", "/data"])
+        self.assertEqual(guardlib.words('echo "a > b" > out'), ["echo", "a > b"])
+
     def test_quiet_pushes_only_for_listed_repo_and_feature_branches(self):
         cfg = {"quiet_pushes": [{"repos": ["Acme/Tool"]}]}
 
