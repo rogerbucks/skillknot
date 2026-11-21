@@ -80,7 +80,9 @@ class Outward(unittest.TestCase):
                 self.assertEqual(push["remote"], "origin")
                 self.assertEqual(push["refspecs"], [])
         push = find("git push upstream feature/x > /tmp/push.log 2>&1")[0]
-        self.assertEqual((push["remote"], push["refspecs"]), ("upstream", ["feature/x"]))
+        self.assertEqual(
+            (push["remote"], push["refspecs"]), ("upstream", ["feature/x"])
+        )
         self.assertEqual(find("git push >&- upstream")[0]["remote"], "upstream")
 
     def test_quoted_redirect_does_not_hide_the_next_word(self):
