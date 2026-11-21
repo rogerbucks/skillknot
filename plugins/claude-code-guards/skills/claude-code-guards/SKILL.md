@@ -54,7 +54,7 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 ```json
 {
   "own_github_owners": ["your-github-handle", "your-org"],
-  "allow_paths": ["/exact/path/to/a/file/you/trust"],
+  "allow_paths": ["/exact/path/to/a/file/you/trust", "src/relative/file/in/any/checkout.ts"],
   "rebuildable": ["node_modules", "dist", "__pycache__"],
   "quiet_tools": [
     {"tool": "mcp__server__send_message", "folders": ["~/work/project", "~/work/project-wt-*"]}
@@ -66,7 +66,17 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
 
 - **`own_github_owners`:** GitHub owners whose repos may get `gh` writes without a prompt. A
   push and a release still ask
-- **`allow_paths`:** exact paths the secret guard lets through. Use whole paths, not patterns
+- **`allow_paths`:** paths the secret guard lets through. Use whole paths, not patterns.
+  - **An absolute entry** (starting with `/` or `~`) matches only that exact path
+  - **A relative entry with a `/`** such as `src/components/SecretsPanel.tsx` matches as a path
+    suffix: `src/...`, `./src/...` or `/any/checkout/or/worktree/src/...`, including inside a
+    longer argument such as a sed or perl substitution. One entry covers every checkout
+  - **A bare name, or an entry naming a secret file or store** (`.env`, `config/.env`,
+    `.ssh/config`, `id_rsa`), matches only exactly. It never covers the same name elsewhere
+  - **Each entry covers that one path,** never what is under it. The text before a relative
+    entry is still checked, so an entry never excuses a secret folder above it
+  - **An empty list allows nothing.** A command whose argument still reads as a secret-shaped path
+    is refused as before, until you add an entry. This is intended: nobody is opted in by default
 - **`rebuildable`:** folder names a recursive delete may remove without a prompt, when it removes
   only those. Use them for folders a build makes again
 - **`quiet_tools`:** connector tools the connector guard stops asking about, for chosen folders only.
@@ -91,6 +101,16 @@ Optional JSON at `~/.config/skillknot/claude-code-guards.json`. It stays on your
   plain command spellings only, so a push through a script or alias is not covered
 - **`off`:** guards to turn off, from `outward`, `destructive`, `secret`, `connector` and
   `tripwire`
+
+**How the secret guard reads a shell command.** An argument that starts like a path (`/`, `~`,
+`./`, `../`, `$HOME`) is read whole, spaces included, as it always was. Any other argument is read
+as path-shaped runs: whitespace, quotes, backticks, `<` `>`, shell operators, commas and
+backslashes end a run, while globs, braces and brackets stay part of it. In an argument with
+spaces, such as a commit message, only runs with a `/` count. So prose and regex text that mention
+a file are no longer read as one long path. A run with `/` still reads as a path, so a
+slash-delimited substitution such as `s/SecretsPanel/Vault/` looks like a folder named
+`SecretsPanel` and is still checked. A relative path with spaces that does not start with `./` is
+read as prose.
 
 ## Harden the project's settings
 

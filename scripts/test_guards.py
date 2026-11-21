@@ -293,6 +293,137 @@ class Secret(unittest.TestCase):
         ):
             self.assertTrue(find(bad), bad)
 
+    def bash(self, command, allow=None, cwd="/work/repo"):
+        """The secret guard's decision on one Bash command, with an optional allow_paths list."""
+        event = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": cwd}
+        return hook(
+            "secret_guard.py", event, {"allow_paths": allow} if allow is not None else None
+        )
+
+    def test_prose_and_regex_are_not_one_path(self):
+        """Spaces, quotes and regex syntax end a path, so prose is not read as one long path."""
+        for good in (
+            'echo "rename SecretsPanel to Vault/Panel"',
+            "perl -pi -e 's/^/see src\\/SecretsPanel.tsx /' notes.md",
+            "grep -rn 'SecretsPanel|VaultPanel/' src",
+        ):
+            self.assertIsNone(self.bash(good), good)
+
+    def test_allow_paths_inside_a_substitution(self):
+        """An allowed relative path inside a sed or perl substitution lets the command through;
+        with an empty list the same command is denied, as before."""
+        sed = "sed -i '' 's#tests/fooSecretsRender.test.mjs#tests/fooSecretsRender.spec.mjs#' README.md"
+        entry = ["tests/fooSecretsRender.test.mjs"]
+        self.assertIsNone(self.bash(sed, entry))
+        self.assertEqual(self.bash(sed, []), "deny")
+        self.assertEqual(self.bash(sed), "deny")
+        perl = "perl -pi -e 's#tests/fooSecretsRender.test.mjs#tests/b.mjs#' README.md"
+        self.assertIsNone(self.bash(perl, entry))
+        self.assertEqual(self.bash(perl, []), "ask")
+
+    def test_relative_allow_entry_matches_any_checkout(self):
+        """A relative entry matches as a path suffix, from the repo root or from any worktree."""
+        entry = ["src/components/SecretsPanel.tsx"]
+        for command in (
+            'grep -n "x" src/components/SecretsPanel.tsx',
+            'grep -n "x" ./src/components/SecretsPanel.tsx',
+            'grep -n "x" /work/repo-wt-a/src/components/SecretsPanel.tsx',
+        ):
+            self.assertIsNone(self.bash(command, entry), command)
+        folder = ["src/SecretsPanel/view.tsx"]
+        for command in (
+            'grep -n "x" src/SecretsPanel/view.tsx',
+            'grep -n "x" /work/repo-wt-a/src/SecretsPanel/view.tsx',
+        ):
+            self.assertIsNone(self.bash(command, folder), command)
+            self.assertEqual(self.bash(command, []), "deny", command)
+        read = {
+            "tool_name": "Read",
+            "tool_input": {"file_path": "/work/repo-wt-a/src/SecretsPanel/view.tsx"},
+        }
+        self.assertIsNone(hook("secret_guard.py", read, {"allow_paths": folder}))
+
+    def test_allow_entries_stay_narrow(self):
+        """An absolute entry matches only exactly, a relative entry never excuses a secret folder
+        above it, and an entry covers that one path, not what sits under it."""
+        self.assertEqual(
+            self.bash("cat /work/other/src/SecretsPanel/view.tsx", ["/work/repo/src/SecretsPanel/view.tsx"]),
+            "deny",
+        )
+        self.assertEqual(self.bash("cat ~/secrets/tests/a.txt", ["tests/a.txt"]), "deny")
+        self.assertEqual(self.bash("cat ~/.ssh/src/a.pem", ["src/a.pem"]), "deny")
+        self.assertEqual(
+            self.bash("cat src/SecretsPanel/view.tsx/../../../.env", ["src/SecretsPanel/view.tsx"]),
+            "deny",
+        )
+        self.assertEqual(
+            self.bash("ls ./secret-store/inner/", ["secret-store"]), "ask"
+        )
+
+    def test_real_protections_unchanged(self):
+        for command, decision in (
+            ("cat ~/.ssh/id_rsa", "deny"),
+            ("cat .env", "deny"),
+            ("cat ./secrets/token.txt", "deny"),
+            ("cat ~/secrets/x", "deny"),
+            ("ls ./secret-store/", "ask"),
+            ('cat "/x/My Secrets/a.md"', "deny"),
+            ("cat /x/key.pem", "deny"),
+            ("cat ~/.ssh/*", "deny"),
+            ("cat ~/.{ssh,aws}/credentials", "deny"),
+            ("scp host:~/.ssh/id_ed25519 .", "deny"),
+            ("cat $HOME/.aws/credentials", "deny"),
+            ("tar czf out.tgz ~/.gnupg", "deny"),
+            ("security find-generic-password -s x", "ask"),
+            ("op item get x", "ask"),
+            ("vim ~/.ssh/config", "ask"),
+            ("python3 run.py --key=./certs/server.pem", "ask"),
+        ):
+            self.assertEqual(self.bash(command), decision, command)
+            self.assertEqual(self.bash(command, ["src/components/SecretsPanel.tsx"]), decision, command)
+        self.assertIsNone(self.bash("cat .env.example"))
+
+    def test_splitting_never_opens_a_secret_folder(self):
+        """Globs, braces, brackets and spaces inside a real path do not hide a secret folder."""
+        for command, decision in (
+            ("cat ~/secret-keys*/a.txt", "deny"),
+            ("cat secret-keys*/a.txt", "deny"),
+            ("cat ~/x/*secret-key*/a", "deny"),
+            ("cat ~/secret_store{/a,/b}", "deny"),
+            ("cat src/secret_store[12]/a", "deny"),
+            ('cat "/x/Secret-Keys (old)/a.md"', "deny"),
+            ('cat "/x/secretive files/a.md"', "deny"),
+            ("cat /x/secret-keys\\(1\\)/a", "deny"),
+            ('vim "/x/secret_store v2/a"', "ask"),
+            ("cat ~/.ssh/config.sample*", "deny"),
+            ("cat ${HOME}/.ssh/id_rsa", "deny"),
+        ):
+            self.assertEqual(self.bash(command), decision, command)
+
+    def test_prose_naming_secret_words_stays_quiet(self):
+        """A message that only mentions secrets is not a path; one with a secret path still is."""
+        for good in (
+            'git commit -m "Move secrets to the vault"',
+            'git commit -m "Load .env in dev"',
+            'gh pr create --body "rotate credentials"',
+            'git commit -m "copy .env.example to start"',
+        ):
+            self.assertIsNone(self.bash(good), good)
+        self.assertEqual(self.bash('git commit -m "read ~/.ssh/config"'), "ask")
+
+    def test_allow_entries_that_never_widen(self):
+        """A bare name or a secret file never matches as a suffix; it still matches exactly."""
+        self.assertEqual(self.bash("cat ~/prod/.env", [".env"]), "deny")
+        self.assertIsNone(self.bash("cat .env", [".env"]))
+        self.assertEqual(self.bash("cat /a/config/.env", ["config/.env"]), "deny")
+        self.assertEqual(self.bash("cat /a/x/.ssh/config", [".ssh/config"]), "deny")
+        self.assertEqual(self.bash("cat /a/secret+x+/id", ["x"]), "deny")
+        self.assertEqual(self.bash("cat /a/secret+b/x+/id", ["b/x"]), "deny")
+        read = {"tool_name": "Read", "tool_input": {"file_path": "/etc/app/.env"}}
+        self.assertEqual(hook("secret_guard.py", read, {"allow_paths": [".env"]}), "deny")
+        spaced = "/data/My Secrets/a.md"
+        self.assertIsNone(self.bash(f'cat "{spaced}"', [spaced]))
+
 
 class Destructive(unittest.TestCase):
     def test_finds_risks(self):
